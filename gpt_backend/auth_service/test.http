@@ -1,0 +1,10 @@
+### GET request to localhost:8000
+GET http://localhost:8000/
+
+### POST request to localhost:8000
+POST http://localhost:8000/
+Content-Type: application/json
+
+{
+    "key": "value"
+}

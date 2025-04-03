@@ -163,3 +163,4 @@ cython_debug/
 # to hide the secrets 
 .env
 *.env
+auth_service.db

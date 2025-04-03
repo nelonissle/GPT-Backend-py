@@ -5,3 +5,5 @@ sqlalchemy
 pydantic
 pytest
 httpx
+bcrypt
+passlib[bcrypt]
