@@ -8,3 +8,23 @@ Content-Type: application/json
 {
     "key": "value"
 }
+
+
+### POST request to register a new user
+POST http://localhost:8000/register
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "StrongPassword123!",
+    "role": "Kunde"
+}
+
+### POST request to login with the registered user
+POST http://localhost:8000/login
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "StrongPassword123!"
+}
