@@ -1,0 +1,81 @@
+version: "3.9"
+
+services:
+  kong-database:
+    image: postgres:15-alpine
+    container_name: kong-database
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: kongpass
+      POSTGRES_DB: kong
+    volumes:
+      - kong-db:/var/lib/postgresql/data
+
+  kong-migrations:
+    image: kong:latest
+    container_name: kong-migrations
+    command: kong migrations bootstrap
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+    depends_on:
+      - kong-database
+
+  kong-gateway:
+    image: kong:latest
+    container_name: kong-gateway
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+      KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
+    volumes:
+      - ./kong/kong.yml:/etc/kong/kong.yml
+    depends_on:
+      - kong-migrations
+
+  mongo_db:
+    image: mongo:latest
+    container_name: mongo_db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  auth_service:
+    build: ./auth_service
+    container_name: auth_service
+    ports:
+      - "8002:8002"
+    env_file:
+      - ./auth_service/.env
+    volumes:
+      - ./auth_service:/app
+    depends_on:
+      - kong-gateway
+
+  chat_service:
+    build: ./chat_service
+    container_name: chat_service
+    ports:
+      - "8003:8003"
+    env_file:
+      - ./chat_service/.env
+    volumes:
+      - ./chat_service:/app
+    depends_on:
+      - mongo_db
+      - kong-gateway
+
+volumes:
+  kong-db:
+  mongo_data:
