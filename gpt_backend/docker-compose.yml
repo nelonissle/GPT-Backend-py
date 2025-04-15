@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: kong
     volumes:
       - kong-db:/var/lib/postgresql/data
+    networks:
+      - gpt_backend_network
 
   kong-migrations:
     image: kong:latest
@@ -22,6 +24,8 @@ services:
       KONG_PG_PASSWORD: kongpass
     depends_on:
       - kong-database
+    networks:
+      - gpt_backend_network
 
   kong-gateway:
     image: kong:latest
@@ -37,6 +41,8 @@ services:
       KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
     volumes:
       - ./kong/kong.yml:/etc/kong/kong.yml
+    networks:
+      - gpt_backend_network
     depends_on:
       - kong-migrations
 
@@ -50,6 +56,9 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      - gpt_backend_network
+    restart: always
 
   auth_service:
     build: ./auth_service
@@ -60,8 +69,12 @@ services:
       - ./auth_service/.env
     volumes:
       - ./auth_service:/app
+    # - ./auth_service/db:/app/db  # Persist SQLite database
+    networks:
+      - gpt_backend_network
     depends_on:
       - kong-gateway
+    restart: always
 
   chat_service:
     build: ./chat_service
@@ -72,10 +85,17 @@ services:
       - ./chat_service/.env
     volumes:
       - ./chat_service:/app
+    networks:
+      - gpt_backend_network
     depends_on:
-      - mongo_db
       - kong-gateway
+      - mongo_db
+    restart: always
 
 volumes:
   kong-db:
   mongo_data:
+
+networks:
+  gpt_backend_network:
+    name: gpt_backend_network
