@@ -24,9 +24,5 @@ EXPOSE 8002
 # Define environment variable for Python to not buffer output (helpful for logs)
 ENV PYTHONUNBUFFERED=1
 
-# Create a non-root user and switch to it
-RUN adduser -D myuser
-USER myuser
-
 # Command to run the application using uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8002"]

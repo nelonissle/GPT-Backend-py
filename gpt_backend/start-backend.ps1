@@ -21,28 +21,5 @@ try {
     Write-Host "❌ MongoDB is not reachable." -ForegroundColor Red
 }
 
-# Check Kong API Gateway Health
-Write-Host "📌 Checking Kong API Gateway Status:" -ForegroundColor Cyan
-try {
-    Invoke-RestMethod http://localhost:8001/status
-} catch {
-    Write-Host "❌ Kong API Gateway is not reachable." -ForegroundColor Red
-}
-
-# Check Microservices
-Write-Host "📌 Auth Service Health Check:" -ForegroundColor Cyan
-try {
-    Invoke-RestMethod http://localhost:8002
-} catch {
-    Write-Host "❌ Auth Service is not reachable." -ForegroundColor Red
-}
-
-Write-Host "📌 Chat Service Health Check:" -ForegroundColor Cyan
-try {
-    Invoke-RestMethod http://localhost:8003
-} catch {
-    Write-Host "❌ Chat Service is not reachable." -ForegroundColor Red
-}
-
 # To stop and remove containers, uncomment the line below:
 # docker compose down

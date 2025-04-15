@@ -1,14 +1,14 @@
 _format_version: "3.0"
 services:
 - name: auth_service
-  url: http://auth_service:8002
+  url: http://auth_service:8002/auth
   routes:
   - name: auth
     paths:
     - /auth
 
 - name: chat_service
-  url: http://chat_service:8003
+  url: http://chat_service:8003/chat 
   routes:
   - name: chat
     paths:

@@ -36,3 +36,61 @@ If you add a new Kong node to your setup:
 
 Connect the new node to the same database by setting the KONG_DATABASE, KONG_PG_HOST, KONG_PG_USER, and KONG_PG_PASSWORD environment variables in the docker-compose.yml file.
 The new node will automatically pull the existing configuration from the database. No additional configuration is needed.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+example Kong file 
+
+```bash 
+_format_version: "3.0"
+
+services:
+  - name: auth_service
+    url: http://auth_service:8002/auth
+    routes:
+      - name: auth
+        paths:
+          - /auth
+        strip_path: true
+
+  - name: chat_service
+    url: http://chat_service:8003/chat 
+    routes:
+      - name: chat
+        paths:
+          - /chat
+        strip_path: true
+
+plugins:
+  - name: jwt
+    service: chat_service
+    config:
+      uri_param_names:
+        - jwt
+      header_names:
+        - authorization
+      claims_to_verify:
+        - exp
+      key_claim_name: iss
+
+consumers:
+  - username: frontend-app
+
+jwt_secrets:
+  - consumer: frontend-app
+    key: frontend-client
+    secret: yourSuperSecretKeyHere
+    algorithm: HS256
+
+```

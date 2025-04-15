@@ -1,16 +1,12 @@
-### GET request to localhost:8000
-GET http://localhost:8000/
-
-
 ### GET request to get all users
-GET http://localhost:8000/users
+GET http://localhost:8000/auth/users
 
 ### POST request to register a new user
 POST http://localhost:8000/register
 Content-Type: application/json
 
 {
-    "username": "testuser2",
+    "username": "testuser3",
     "password": "StrongPassword123!",
     "role": "Admin"
 }
@@ -32,4 +28,20 @@ Content-Type: application/json
 {
     "username": "admin",
     "password": "AdminPassword123!"
+}
+
+### GET request to test Kong route for /auth
+GET http://localhost:8000/auth
+
+### GET request to test Kong route for /auth/seed
+GET http://localhost:8000/chat
+
+
+### Test Register
+POST http://localhost:8000/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "testuser4",
+  "password": "StrongPassword123!"
 }
