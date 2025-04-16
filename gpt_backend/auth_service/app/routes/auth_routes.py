@@ -1,17 +1,14 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from datetime import timedelta
-import os
-
 from app.database import get_db
 from app.models.user import User
 from app.utils.jwt_helper import create_access_token
-from app.utils.password_utils import hash_password, verify_password, is_valid_password  # Falls du diese ggf. weiter auslagerst
+from app.utils.password_utils import hash_password, verify_password, is_valid_password
+from app.utils.kong_consumer import create_kong_consumer, create_kong_jwt_credentials
 
 router = APIRouter()
 
-# Pydantic-Modelle
 class UserRegister(BaseModel):
     username: str
     password: str
@@ -42,9 +39,20 @@ async def register(user: UserRegister, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     
-   # Bei der Registrierung:
+    # Automatically create a Kong consumer and add JWT credentials for this user.
+    try:
+        create_kong_consumer(new_user.username)
+    except Exception as e:
+        print(f"Warning: Failed to create Kong consumer: {e}")
+    
+    try:
+        create_kong_jwt_credentials(new_user.username)
+    except Exception as e:
+        print(f"Warning: Failed to create Kong JWT credentials: {e}")
+    
+    # Generate JWT token with 'sub' set to the new user's username.
     access_token = create_access_token(data={
-        "sub": new_user.username,  # Hier wird der Benutzername als "sub" gesetzt
+        "sub": new_user.username,
         "role": new_user.role
     })
 
@@ -58,13 +66,9 @@ async def register(user: UserRegister, db: Session = Depends(get_db)):
 @router.post("/login")
 async def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.username == user.username).first()
-    if not db_user:
+    if not db_user or not verify_password(user.password, db_user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid username or password.")
     
-    if not verify_password(user.password, db_user.password_hash):
-        raise HTTPException(status_code=401, detail="Invalid username or password.")
-    
-    # Erzeuge JWT für den Login
     access_token = create_access_token(data={"sub": db_user.username, "role": db_user.role})
     return {"message": "Login successful.", "access_token": access_token, "token_type": "bearer"}
 

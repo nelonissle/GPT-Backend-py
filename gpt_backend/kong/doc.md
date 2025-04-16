@@ -39,6 +39,35 @@ The new node will automatically pull the existing configuration from the databas
 
 
 
+Migration for kong 
+Schritt 3: Kong-Migration durchführen
+Da du nun den DB‑Mode verwendest, musst du zunächst die erforderlichen Datenbanktabellen migrieren. Dies machst du mit dem Kong-Migrationsbefehl.
+
+Führe dazu in deinem Kong-Gateway-Container folgenden Befehl aus (bevor du Kong vollständig startest):
+
+bash
+Kopieren
+docker-compose run --rm kong-gateway kong migrations bootstrap
+Dies initialisiert die Datenbank und legt alle benötigten Tabellen und Schemas an.
+
+Falls du später Änderungen an der Konfiguration vornimmst, kannst du auch kong migrations up und kong migrations finish nutzen.
+
+
+
+
+
+Starte die Container, oder zumindest den kong-database-Container:
+
+bash
+Kopieren
+docker-compose up kong-database
+Warte einige Sekunden (oder prüfe manuell, ob PostgreSQL verfügbar ist).
+
+Führe dann den Migrationsbefehl aus:
+
+bash
+Kopieren
+docker-compose run --rm kong-migrations kong migrations bootstrap
 
 
 
@@ -48,49 +77,33 @@ The new node will automatically pull the existing configuration from the databas
 
 
 
+Kong Setup with CURL:
+1. Auth-Service als Kong-Service registrieren
+bash
+Kopieren
+curl -i -X POST "http://localhost:8001/services/" --data "name=auth_service" --data "url=http://auth_service:8002/auth"
+2. Route für den Auth-Service erstellen
+bash
+Kopieren
+curl -i -X POST "http://localhost:8001/services/auth_service/routes" --data "paths[]=/auth"
+3. Chat-Service als Kong-Service registrieren
+bash
+Kopieren
+curl -i -X POST "http://localhost:8001/services/" --data "name=chat_service" --data "url=http://chat_service:8003/chat"
+4. Route für den Chat-Service erstellen
+bash
+Kopieren
+curl -i -X POST "http://localhost:8001/services/chat_service/routes" --data "paths[]=/chat"
+5. Routen abfragen (um die Route-ID zu ermitteln)
+bash
+Kopieren
+curl -i "http://localhost:8001/routes"
+Notiere dir die "id" der Chat-Route, da du diese für den nächsten Schritt benötigst.
 
+6. JWT-Plugin an die Chat-Route anhängen
+Ersetze <ROUTE_ID> durch die zuvor ermittelte Route-ID:
+bash
+Kopieren
+ curl -i -X POST "http://localhost:8001/routes/bd6bf78c-c408-4e33-bc75-d4ca20bcbb71/plugins" \ --data-urlencode "name=jwt" \  --data-urlencode "config.claims_to_verify[]=exp" \ --data-urlencode "config.secret_is_base64=false" \ --data-urlencode "config.key_claim_name=sub"
 
-example Kong file 
-
-```bash 
-_format_version: "3.0"
-
-services:
-  - name: auth_service
-    url: http://auth_service:8002/auth
-    routes:
-      - name: auth
-        paths:
-          - /auth
-        strip_path: true
-
-  - name: chat_service
-    url: http://chat_service:8003/chat 
-    routes:
-      - name: chat
-        paths:
-          - /chat
-        strip_path: true
-
-plugins:
-  - name: jwt
-    service: chat_service
-    config:
-      uri_param_names:
-        - jwt
-      header_names:
-        - authorization
-      claims_to_verify:
-        - exp
-      key_claim_name: iss
-
-consumers:
-  - username: frontend-app
-
-jwt_secrets:
-  - consumer: frontend-app
-    key: frontend-client
-    secret: yourSuperSecretKeyHere
-    algorithm: HS256
-
-```
+Diese Befehle richten die Services, Routen und das JWT-Plugin dynamisch über die Kong Admin API ein. Beachte, dass du diese Befehle in einer Unix-kompatiblen Shell (z. B. bash) ausführst – in Linux, macOS oder über WSL auf Windows. Falls du Fragen hast oder weitere Anpassungen benötigst, stehe ich gern zur Verfügung!

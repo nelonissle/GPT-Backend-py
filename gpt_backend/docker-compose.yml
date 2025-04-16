@@ -1,21 +1,63 @@
 version: "3.9"
 
 services:
+  kong-database:
+    image: postgres:14
+    container_name: kong-database
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: kongpassword
+    volumes:
+      - kong_pgdata:/var/lib/postgresql/data
+    networks:
+      - gpt_backend_network
+    restart: always
+
+  kong-migrations:
+    image: kong:latest
+    container_name: kong-migrations
+    command: kong migrations bootstrap
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PORT: 5432
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpassword
+      KONG_PG_DATABASE: kong
+    networks:
+      - gpt_backend_network
+    depends_on:
+      - kong-database
+    restart: "no"
+
   kong-gateway:
     image: kong:latest
     container_name: kong-gateway
     ports:
-      - "8000:8000"
-      - "8001:8001"
+      - "8000:8000"   # HTTP Proxy
+      - "8443:8443"   # HTTPS Proxy
+      - "8001:8001"   # Admin API
+      - "8444:8444"   # Admin API HTTPS (optional, recommended for production)
     environment:
-      # Use DB-less mode
-      KONG_DATABASE: "off"
-      # Load configuration from the file
-      KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
-    volumes:
-      - ./kong/kong.yml:/etc/kong/kong.yml
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PORT: 5432
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpassword
+      KONG_PG_DATABASE: kong
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_LOG_LEVEL: "debug"
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
     networks:
       - gpt_backend_network
+    depends_on:
+      - kong-database
+      - kong-migrations
+    restart: always
 
   mongo_db:
     image: mongo:latest
@@ -65,6 +107,7 @@ services:
 
 volumes:
   mongo_data:
+  kong_pgdata:
 
 networks:
   gpt_backend_network:

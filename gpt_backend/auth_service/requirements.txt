@@ -5,8 +5,8 @@ sqlalchemy
 pydantic
 pytest
 httpx
-bcrypt
 passlib[bcrypt]
 pyjwt
 pyyaml
 requests
+bcrypt==4.0.1
