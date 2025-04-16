@@ -1,14 +1,24 @@
-# Use an official Python runtime as a parent image
-FROM python:3.12-alpine
+# Basis-Image
+FROM python:3.10-alpine
 
-# Set the working directory in the container
+# Arbeitsverzeichnis festlegen
 WORKDIR /app
 
-# Add a placeholder file to avoid errors
-RUN echo "Chat service is not implemented yet." > /app/placeholder.txt
+# Abhängigkeiten für den Build installieren
+RUN apk add --no-cache gcc musl-dev
 
-# Expose a port (optional, for consistency)
+# requirements.txt kopieren und Python-Pakete installieren
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Anwendungscode kopieren
+COPY ./app /app
+
+# .env kopieren
+COPY .env /app/.env
+
+# Port freigeben
 EXPOSE 8003
 
-# Command to keep the container running
-CMD ["tail", "-f", "/dev/null"]
+# Anwendung mit uvicorn starten
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8003"]

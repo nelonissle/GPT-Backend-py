@@ -1,6 +1,16 @@
 # GPT-Backend-py
  Backend for GPT app in python 
 
+## Ausgangslage
+
+### Ausgangslage der Micro Services
+
+**Auth Service**
+
+**chat Service**
+Der Chat Service soll als schnittpunkt gelten von den anfragen des LLMs und des frontends hier wird also die Logik für 
+die daten speicherung stattfinden also die funktion "Remember chats" so dass das LLM (das LLM muss ich noch auswählen entweder eines von Olma oder LM Studio also einen LLM das ich local herunterladen kann) das iel ist es die anfrage und das ergebniss von dem LLM in eine Mongo DB zu schreiben. Wichtig ist aber wenn ich mich anmelde oder registriere mit verschiedenen usern dan müssen die anfragen dem entsprechend in ein eigene db gespeichert werden also zb: ich registriere mich als nelo und schicke dan eine anfrage von meinem frontend u meinem backend dann muss im backend einen Collection mit dem namen des users erstellt werden und für jeden chat den ich mache (also es gibt dan die Funktion "New chat" so wie es sie in chatGPT gibt) das heisst wen ein neuere user sich registiert dan macht es automatisch einen neue collection für ihn mit dem nahmen und jeder neue chat soll dan eine Document sein mit dem namen des chats der name des chats sind immer die ersten drei wörter der ersten such anfrage. Wichtig ist das wen ich mich anmelde also bei einem bestehenden user anmelde ich dan einfach weiter an dieser db arbeite also das heisst das ich dan einfach weiter dokumente mit neuen chats erstelle für diese user collection. das gane muss mit JWT geschütt sein also ich melde/ logge mich im auth service an. Ich Benute dafür Kong API Gateway und fast api ich schicke dir aber noch den code vom auth Service.
+
 ## Ziele und Anforderungen
 
 **Zwingende Anforderungen:**

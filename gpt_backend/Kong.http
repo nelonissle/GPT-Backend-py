@@ -1,0 +1,57 @@
+@Kong_GatewayAddress = http://localhost:8000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjciLCJyb2xlIjoiS3VuZGUiLCJpc3MiOiJuZWxvIiwiaWF0IjoxNzQ0ODA5ODkwLCJleHAiOjE3NDUwNjkwOTAsImp0aSI6ImJlY2ZhNjkyLTQ1ZjMtNDhhMi05NzM4LTE1NDc3ZTVmZjhkMCJ9.jAPNwiqD2dCxMXNS3_WsWSl5xtdri1JVU5KgEsSBAPE
+
+### Test: Registrierung eines neuen Users über den Kong-Gateway
+POST {{Kong_GatewayAddress}}/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "testuser7",
+  "password": "VeryStrongPassword123!@",
+  "role": "Kunde"
+}
+
+### Test: Login mit dem neuen User (über den Kong-Gateway)
+POST {{Kong_GatewayAddress}}/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "testuser5",
+  "password": "VeryStrongPassword123!@"
+}
+
+### GET request to get all users
+GET {{Kong_GatewayAddress}}/auth/users
+
+### 
+# In der Login-Antwort erhältst du ein "access_token". Kopiere diesen Token für die folgenden Anfragen.
+###
+
+### Test: Neuen Chat erstellen (über den Kong-Gateway)
+# Ersetze <ACCESS_TOKEN> im folgenden Request durch den JWT Token aus dem Login-Response.
+POST {{Kong_GatewayAddress}}/chat/new HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "initial_query": "Hallo, das ist ein Testchat über Kong Gateway",
+  "llm_response": "Dies ist eine Dummy-Antwort des LLMs."
+}
+
+### 
+# Die Antwort enthält eine "chat_id", die den neuen Chat identifiziert.
+###
+
+### Test: Eine weitere Nachricht zum aktuellen Chat hinzufügen (ohne explizite chat_id, daher wird in den zuletzt aktiven Chat geschrieben)
+POST {{Kong_GatewayAddress}}/chat/add HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "role": "user",
+  "text": "Hier füge ich eine weitere Nachricht im gleichen Chat ein."
+}
+
+### Test: Chat-Historie abrufen (über den Kong-Gateway)
+GET {{Kong_GatewayAddress}}/chat/history HTTP/1.1
+Authorization: Bearer {{token}}

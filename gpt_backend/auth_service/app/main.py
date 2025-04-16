@@ -1,14 +1,7 @@
 from fastapi import FastAPI
-from dotenv import load_dotenv
-from app.auth import app as auth_app  # Import the auth app
-
-load_dotenv()
+from app.routes import auth_routes
 
 app = FastAPI()
 
-# Include the auth routes under /auth
-app.mount("/auth", auth_app)
-
-@app.get("/")
-def read_root():
-    return {"message": "AuthService is running"}
+# Route-Prefix setzen (zum Beispiel /auth)
+app.include_router(auth_routes.router, prefix="/auth", tags=["Authentication"])
