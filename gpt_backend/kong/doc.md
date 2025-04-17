@@ -1,44 +1,3 @@
-Yes, you need to enter the container as the root user to install packages like curl or wget. By default, the Kong Gateway container runs as a non-root user for security reasons. To gain root access, you can override the user when executing the container shell.
-
-Steps to Enter the Container as Root
-Run the following command to enter the container as the root user:
-docker exec -u root -it kong-gateway sh
-
-Once inside the container, you can install curl using the following commands:
-apt update
-apt install -y curl
-
-After installing curl, test the Kong Admin API:
-curl http://localhost:8001/status
-
-If You Still Encounter Issues
-If you cannot install curl or apt commands fail, you can debug the Kong Gateway from the host machine or extend the Kong image to include debugging tools (as described in the previous response).
-
-Let me know if you need further assistance!
-
-
-
-
-How to Use the kong.yml File with Database Mode
-If you want to use the kong.yml file to set up services and routes in Database Mode, you can import the configuration into the database using Kong's Admin API. This way, you don't have to manually configure services and routes via the Admin API.
-
-Steps to Import kong.yml into the Database
-Use the following command to import the kong.yml file into the database:
-curl -X POST http://localhost:8001/config \
-     -F "config=@kong/kong.yml"
-
-http://localhost:8001: The Admin API endpoint.
-kong.yml: Specifies the path to the kong.yml file.
-After importing, the services and routes will be stored in the database and shared across all Kong nodes connected to the same database.
-
-When Adding New Kong Nodes
-If you add a new Kong node to your setup:
-
-Connect the new node to the same database by setting the KONG_DATABASE, KONG_PG_HOST, KONG_PG_USER, and KONG_PG_PASSWORD environment variables in the docker-compose.yml file.
-The new node will automatically pull the existing configuration from the database. No additional configuration is needed.
-
-
-
 Migration for kong 
 Schritt 3: Kong-Migration durchführen
 Da du nun den DB‑Mode verwendest, musst du zunächst die erforderlichen Datenbanktabellen migrieren. Dies machst du mit dem Kong-Migrationsbefehl.
@@ -70,40 +29,97 @@ Kopieren
 docker-compose run --rm kong-migrations kong migrations bootstrap
 
 
-
-
-
-
-
-
-
 Kong Setup with CURL:
 1. Auth-Service als Kong-Service registrieren
 bash
 Kopieren
 curl -i -X POST "http://localhost:8001/services/" --data "name=auth_service" --data "url=http://auth_service:8002/auth"
-2. Route für den Auth-Service erstellen
+1. Route für den Auth-Service erstellen
 bash
 Kopieren
 curl -i -X POST "http://localhost:8001/services/auth_service/routes" --data "paths[]=/auth"
-3. Chat-Service als Kong-Service registrieren
+1. Chat-Service als Kong-Service registrieren
 bash
 Kopieren
 curl -i -X POST "http://localhost:8001/services/" --data "name=chat_service" --data "url=http://chat_service:8003/chat"
-4. Route für den Chat-Service erstellen
+1. Route für den Chat-Service erstellen
 bash
 Kopieren
 curl -i -X POST "http://localhost:8001/services/chat_service/routes" --data "paths[]=/chat"
-5. Routen abfragen (um die Route-ID zu ermitteln)
+1. Routen abfragen (um die Route-ID zu ermitteln)
 bash
 Kopieren
 curl -i "http://localhost:8001/routes"
 Notiere dir die "id" der Chat-Route, da du diese für den nächsten Schritt benötigst.
 
-6. JWT-Plugin an die Chat-Route anhängen
+1. JWT-Plugin an die Chat-Route anhängen
 Ersetze <ROUTE_ID> durch die zuvor ermittelte Route-ID:
 bash
 Kopieren
  curl -i -X POST "http://localhost:8001/routes/bd6bf78c-c408-4e33-bc75-d4ca20bcbb71/plugins" \ --data-urlencode "name=jwt" \  --data-urlencode "config.claims_to_verify[]=exp" \ --data-urlencode "config.secret_is_base64=false" \ --data-urlencode "config.key_claim_name=sub"
 
 Diese Befehle richten die Services, Routen und das JWT-Plugin dynamisch über die Kong Admin API ein. Beachte, dass du diese Befehle in einer Unix-kompatiblen Shell (z. B. bash) ausführst – in Linux, macOS oder über WSL auf Windows. Falls du Fragen hast oder weitere Anpassungen benötigst, stehe ich gern zur Verfügung!
+
+
+Kong setup for admin_service:
+Here are the exact one‑liner curl commands you can copy‑&‑paste to set up your admin_service in Kong:
+
+Register the admin service
+
+bash
+Kopieren
+Bearbeiten
+curl -i -X POST http://localhost:8001/services --data name=admin_service --data url=http://admin_service:8004
+Create the /admin route
+
+bash
+Kopieren
+Bearbeiten
+curl -i -X POST http://localhost:8001/services/admin_service/routes  --data name=admin_route  --data 'paths[]=/admin' --data strip_path=false
+Enable JWT validation on that route
+
+bash
+Kopieren
+Bearbeiten
+curl -i -X POST http://localhost:8001/routes/admin_route/plugins --data name=jwt --data 'config.claims_to_verify[]=exp'
+
+
+
+## Beispiel für kong config DB off
+```yml
+_format_version: "3.0"
+
+services:
+- name: auth_service
+  url: http://auth_service:8002/auth
+  routes:
+  - name: auth
+    paths:
+    - /auth
+
+- name: chat_service
+  url: http://chat_service:8003/chat 
+  routes:
+  - name: chat
+    paths:
+    - /chat
+    plugins:
+    - name: jwt
+      config:
+        claims_to_verify:
+        - exp
+        secret_is_base64: false
+        key_claim_name: sub    # Hier wird der "sub"-Claim zur Identifikation genutzt
+
+consumers:
+- username: testuser
+  jwt_secrets:
+  - key: testkey
+    secret: 084I8UAP68F-gNpJQWJX5_ftpw9aBKXBNO4NZVVCeI0
+```
+
+
+
+Kong Monitoring 
+Promethues setup:
+curl -s -X POST http://localhost:8001/plugins --data "name=prometheus" --data "config.scrape_interval=5" --data "config.path=/metrics"

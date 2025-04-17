@@ -1,3 +1,5 @@
+# app/routes/chat_routes.py
+
 import os
 from datetime import datetime
 from bson import ObjectId
@@ -48,19 +50,20 @@ async def new_chat(request: NewChatRequest, credentials: HTTPAuthorizationCreden
     chat_name = " ".join(words[:3]) if len(words) >= 3 else request.initial_query
 
     # Zusammenstellen des Chat-Dokuments
+    now = datetime.utcnow()
     chat_doc = {
         "chat_name": chat_name,
-        "timestamp": datetime.utcnow(),
+        "timestamp": now,
         "messages": [
             {
                 "role": "user",
                 "text": request.initial_query,
-                "timestamp": datetime.utcnow()
+                "timestamp": now
             },
             {
                 "role": "llm",
                 "text": request.llm_response,
-                "timestamp": datetime.utcnow()
+                "timestamp": now
             }
         ]
     }
@@ -90,15 +93,23 @@ async def add_message(message: ChatMessageInput, credentials: HTTPAuthorizationC
             raise HTTPException(status_code=404, detail="Kein aktiver Chat gefunden. Bitte erstelle einen neuen Chat.")
         chat_id = active_chat["_id"]
     else:
-        chat_id = message.chat_id
+        chat_id = ObjectId(message.chat_id)
 
+    now = datetime.utcnow()
     update_result = user_collection.update_one(
-        {"_id": ObjectId(chat_id)},
-        {"$push": {"messages": {
-            "role": message.role,
-            "text": message.text,
-            "timestamp": datetime.utcnow()
-        }}}
+        {"_id": chat_id},
+        {
+            # Neue Nachricht anhängen
+            "$push": {
+                "messages": {
+                    "role": message.role,
+                    "text": message.text,
+                    "timestamp": now
+                }
+            },
+            # Chat-Timestamp bumpen, damit es als aktiv gilt
+            "$set": {"timestamp": now}
+        }
     )
     if update_result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Chat nicht gefunden")
@@ -115,8 +126,31 @@ async def chat_history(credentials: HTTPAuthorizationCredentials = Depends(secur
     
     db = get_db()
     user_collection = db[username]
-    chats = list(user_collection.find())
-    # Konvertiere ObjectId in Strings, um die Daten serialisierbar zu machen
-    for chat in chats:
-        chat["_id"] = str(chat["_id"])
+    raw = user_collection.find().sort("timestamp", -1)
+    
+    chats = []
+    for doc in raw:
+        last_msg = doc["messages"][-1]
+        chats.append({
+            "chat_id": str(doc["_id"]),
+            "chat_name": doc["chat_name"],
+            "last_message": last_msg["text"],
+            "last_timestamp": last_msg["timestamp"]
+        })
     return chats
+
+@router.get("/{chat_id}")
+async def get_chat(chat_id: str, credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    payload = verify_token(token)
+    username = payload.get("sub")
+    if not username:
+        raise HTTPException(status_code=401, detail="Benutzername nicht im Token gefunden")
+
+    db = get_db()
+    user_collection = db[username]
+    chat = user_collection.find_one({"_id": ObjectId(chat_id)})
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat nicht gefunden")
+    chat["_id"] = str(chat["_id"])
+    return chat

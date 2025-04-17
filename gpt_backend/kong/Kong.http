@@ -1,12 +1,16 @@
 @Kong_GatewayAddress = http://localhost:8000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjE3Iiwicm9sZSI6Ikt1bmRlIiwiaXNzIjoidGVzdHVzZXIxNyIsImlhdCI6MTc0NDgyMDk3NCwiZXhwIjoxNzQ1MDgwMTc0LCJqdGkiOiJmYmZkNTAxYS04ZmFjLTQzNzAtODI4MC1iYTVkNTVkMDBlOGQifQ.oTlPG0Ptzscg7AsYop6qicoIF64YZ_VLEVJOd1GFRBc
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjIwIiwicm9sZSI6Ikt1bmRlIiwiaXNzIjoidGVzdHVzZXIyMCIsImlhdCI6MTc0NDg5NTI4OSwiZXhwIjoxNzQ1MTU0NDg5LCJqdGkiOiI0Y2UzMDM5Yy0xNzM0LTQ0ZTYtOGI2NS03NjQwN2Y2NDQxN2MifQ.iqMagPk_kq_kYAClmAZHULZ1XMUIC8gADPf5FM0D-To
+@dev_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0ZGV2MiIsInJvbGUiOiJkZXZlbG9wZXIiLCJpc3MiOiJ0ZXN0ZGV2MiIsImlhdCI6MTc0NDg5NjAxMSwiZXhwIjoxNzQ1MTU1MjExLCJqdGkiOiIwZGMwNDM2OS0xZmI1LTQ1YzctYmE0My0zMmFmMTQ4YWFjNzIifQ.b5-pjq0-2r6cNNfR2EE5jvtI9gEAmmDmVoOrgRMptT4 
+@chatId = 6800e7fb97f278151ce27e58
+@username = testdev1
+
 
 ### Test: Registrierung eines neuen Users über den Kong-Gateway
 POST {{Kong_GatewayAddress}}/auth/register HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "testuser17",
+  "username": "testuser21",
   "password": "VeryStrongPassword123!@",
   "role": "Kunde"
 }
@@ -16,42 +20,92 @@ POST {{Kong_GatewayAddress}}/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "nelo",
+  "username": "testdev2",
   "password": "VeryStrongPassword123!@"
 }
 
 ### GET request to get all users
-GET {{Kong_GatewayAddress}}/auth/users
+GET {{Kong_GatewayAddress}}/auth/users HTTP/1.1
+Authorization: Bearer {{token}}
 
-### 
-# In der Login-Antwort erhältst du ein "access_token". Kopiere diesen Token für die folgenden Anfragen.
-###
-
-### Test: Neuen Chat erstellen (über den Kong-Gateway)
-# Ersetze <ACCESS_TOKEN> im folgenden Request durch den JWT Token aus dem Login-Response.
+### 1. Test: Neuen Chat erstellen
 POST {{Kong_GatewayAddress}}/chat/new HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "initial_query": "Hallo, das ist ein Testchat über Kong Gateway",
-  "llm_response": "Dies ist eine Dummy-Antwort des LLMs."
+  "initial_query": "Hallo, dies ist mein erster Testchat",
+  "llm_response": "Dummy-Antwort des LLM."
 }
 
-### 
-# Die Antwort enthält eine "chat_id", die den neuen Chat identifiziert.
-###
+### → Antwort: {"message":"Neuer Chat erstellt","chat_id":"<SET THIS AS {{chatId}}>"}  
 
-### Test: Eine weitere Nachricht zum aktuellen Chat hinzufügen (ohne explizite chat_id, daher wird in den zuletzt aktiven Chat geschrieben)
+### 2. Test: Nachricht ohne chat_id hinzufügen (schreibt in zuletzt aktive Konversation)
 POST {{Kong_GatewayAddress}}/chat/add HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
   "role": "user",
-  "text": "Hier füge ich eine weitere Nachricht im gleichen Chat ein."
+  "text": "Das ist eine Nachricht im aktiven Chat."
 }
 
-### Test: Chat-Historie abrufen (über den Kong-Gateway)
+### 3. Test: Nachricht mit expliziter chat_id hinzufügen
+POST {{Kong_GatewayAddress}}/chat/add HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "chat_id": "{{chatId}}",
+  "role": "user",
+  "text": "Das ist eine Nachricht in einem bestimmten Chat.TEST1"
+}
+
+### 4. Test: Liste aller Chats (nur Zusammenfassung, sortiert nach zuletzt benutzt)
 GET {{Kong_GatewayAddress}}/chat/history HTTP/1.1
 Authorization: Bearer {{token}}
+
+### 5. Test: Einen einzelnen Chat komplett abrufen
+GET {{Kong_GatewayAddress}}/chat/{{chatId}} HTTP/1.1
+Authorization: Bearer {{token}}
+
+
+### ─────────────────────────────────────────────────────────────
+### Admin‑Service Tests
+### ─────────────────────────────────────────────────────────────
+
+### A. Ohne Token: List all users → 401 Unauthorized
+GET {{Kong_GatewayAddress}}/admin/users HTTP/1.1
+
+### B. Mit normalem User‑Token: List all users → 403 Forbidden
+GET {{Kong_GatewayAddress}}/admin/users HTTP/1.1
+Authorization: Bearer {{token}}
+
+### C. Mit Developer‑Token: List all users → 200 OK
+GET {{Kong_GatewayAddress}}/admin/users HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### D. Developer‑Token: List chats of a specific user
+GET {{Kong_GatewayAddress}}/admin/users/{{username}}/chats HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### E. Developer‑Token: Get a specific chat
+GET {{Kong_GatewayAddress}}/admin/users/{{username}}/chats/{{chatId}} HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### F. Developer‑Token: Delete a specific chat
+DELETE {{Kong_GatewayAddress}}/admin/users/{{username}}/chats/{{chatId}} HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### G. Developer‑Token: Confirm deletion (should no longer find that chat)
+GET {{Kong_GatewayAddress}}/admin/users/{{username}}/chats HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### H. Developer‑Token: Delete the user entirely
+DELETE {{Kong_GatewayAddress}}/admin/users/{{username}} HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### I. Developer‑Token: Confirm user deletion (should return 404)
+GET {{Kong_GatewayAddress}}/admin/users/{{username}}/chats HTTP/1.1
+Authorization: Bearer {{dev_token}}
+ 
