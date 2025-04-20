@@ -16,7 +16,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy the rest of the application code to the container
 COPY ./app ./app
-COPY ./.env ./.env
 
 # Expose the port that FastAPI will run on (here, 8002)
 EXPOSE 8002
