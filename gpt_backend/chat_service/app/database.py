@@ -4,8 +4,8 @@ import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
-# Lade .env Variablen
-load_dotenv()
+# Lade .env Variablen von gpt_backend Verzeichnis
+load_dotenv(dotenv_path="../../.env")
 
 # Hole die MongoDB URI aus den Umgebungsvariablen
 MONGO_SERVICE_HOST = os.getenv("MONGO_SERVICE_HOST")
