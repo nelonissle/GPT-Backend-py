@@ -62,7 +62,7 @@ services:
     ports:
       - "8002:8002"
     env_file:
-      - ./auth_service/.env
+      - ./.env
     volumes:
       - ./auth_service:/app
     networks:
@@ -78,7 +78,7 @@ services:
     ports:
       - "8003:8003"
     env_file:
-      - ./chat_service/.env
+      - ./.env
     volumes:
       - ./chat_service:/app
     networks:
@@ -94,7 +94,7 @@ services:
     ports:
       - "8004:8004"
     env_file:
-      - ./admin_service/.env
+      - ./.env
     volumes:
       - ./auth_service/auth_service.db:/data/auth_service.db:rw
     networks:
