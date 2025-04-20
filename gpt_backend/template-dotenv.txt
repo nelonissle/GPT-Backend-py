@@ -7,6 +7,7 @@ KONG_ADMIN_URL=http://kong-gateway:8001/consumers
 # mongo db
 MONGO_INITDB_ROOT_USERNAME=mongoadmin
 MONGO_SERVICE_HOST=mongo_db
+MONGO_SERVICE_PORT=27017
 
 # kong
 KONG_DATABASE=postgres

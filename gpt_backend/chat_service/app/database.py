@@ -21,9 +21,6 @@ if not MONGO_INITDB_ROOT_USERNAME:
 MONGO_INITDB_ROOT_PASSWORD = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 if not MONGO_INITDB_ROOT_PASSWORD:
     raise ValueError("Die Umgebungsvariable MONGO_INITDB_ROOT_PASSWORD ist nicht gesetzt.")
-MONGO_SERVICE_DB = os.getenv("MONGO_SERVICE_DB")
-if not MONGO_SERVICE_DB:
-    raise ValueError("Die Umgebungsvariable MONGO_SERVICE_DB ist nicht gesetzt.")
 myMongoUri = f"mongodb://{MONGO_INITDB_ROOT_USERNAME}:{MONGO_INITDB_ROOT_PASSWORD}@{MONGO_SERVICE_HOST}:{MONGO_SERVICE_PORT}/"
 # Erstelle eine MongoDB-URI
 client = MongoClient(myMongoUri)
