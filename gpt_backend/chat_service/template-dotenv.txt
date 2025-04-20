@@ -1,9 +1,0 @@
-Here is what the template looks like 
-
-# JWT Secret-Key
-SECRET_KEY=...........................................
-
-# MongoDB Konfiguration (entspricht deiner docker-compose Konfiguration)
-MONGO_INITDB_ROOT_USERNAME=............
-MONGO_INITDB_ROOT_PASSWORD=..............
-MONGO_URI=mongodb://........:........@mongo_db:27017/

@@ -37,3 +37,27 @@ die daten speicherung stattfinden also die funktion "Remember chats" so dass das
 - Selenium
 - Code COvgerage
 - Patterns
+
+# Entwicklungsumgebung
+Um mit LLM's zu arbeiten, wird Ollama verwendet. LM Studio und https://github.com/open-webui/open-webui dienen als Hilfe.
+
+## Ubuntu
+### Notwendige Software
+Ubuntu 24 LTS mit Docker und Microk8s
+
+Ollama via https://ollama.com/download/
+ollama run gemma3:1b (test prompt and exit mit /bye)
+Clone repository
+run gpt_backend/dev-local-init.sh
+
+## Windows
+### Notwendige Software
+Windows 11 mit WSL 2
+WSL 2 Ubuntu 24 LTS, systemd muss laufen (https://learn.microsoft.com/en-us/windows/wsl/systemd)
+Docker Desktop
+
+Für WSL Ubuntu:
+! weitere Software siehe unter Ubuntu
+
+Nur Windows:
+Clone repository

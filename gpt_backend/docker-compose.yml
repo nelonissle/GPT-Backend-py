@@ -3,10 +3,8 @@ services:
   kong-database:
     image: postgres:14
     container_name: kong-database
-    environment:
-      POSTGRES_USER: kong
-      POSTGRES_DB: kong
-      POSTGRES_PASSWORD: kongpassword
+    env_file:
+      - ./.env
     volumes:
       - kong_pgdata:/var/lib/postgresql/data
     networks:
@@ -17,13 +15,8 @@ services:
     image: kong:latest
     container_name: kong-migrations
     command: kong migrations bootstrap
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_PORT: 5432
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kongpassword
-      KONG_PG_DATABASE: kong
+    env_file:
+      - ./.env
     networks:
       - gpt_backend_network
     depends_on:
@@ -34,24 +27,13 @@ services:
     image: kong:latest
     container_name: kong-gateway
     user: root
+    env_file:
+      - ./.env
     ports:
       - "8000:8000"    # HTTP Proxy
       - "8443:8443"    # HTTPS Proxy
       - "8001:8001"    # Admin API HTTP
       - "8444:8444"    # Admin API HTTPS
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_PORT: 5432
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kongpassword
-      KONG_PG_DATABASE: kong
-      KONG_PROXY_ACCESS_LOG: /var/log/kong/access.log
-      KONG_PROXY_ERROR_LOG: /var/log/kong/error.log
-      KONG_ADMIN_ACCESS_LOG: /var/log/kong/admin_access.log
-      KONG_ADMIN_ERROR_LOG: /var/log/kong/admin_error.log
-      KONG_LOG_LEVEL: debug
-      KONG_ADMIN_LISTEN: 0.0.0.0:8001,0.0.0.0:8444 ssl
     volumes:
       - ./kong_logs:/var/log/kong
     networks:
@@ -64,9 +46,8 @@ services:
   mongo_db:
     image: mongo:latest
     container_name: mongo_db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongoadmin
-      MONGO_INITDB_ROOT_PASSWORD: secret
+    env_file:
+      - ./.env
     ports:
       - "27017:27017"
     volumes:
@@ -184,13 +165,24 @@ services:
     container_name: grafana
     ports:
       - "3000:3000"
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: secret
+    env_file:
+      - ./.env
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
       - loki
+    networks:
+      - gpt_backend_network
+    restart: always
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
     networks:
       - gpt_backend_network
     restart: always
@@ -205,6 +197,7 @@ volumes:
   loki_cache:
   loki_wal:
   loki_compactor:
+  ollama_data:
 
 networks:
   gpt_backend_network:
