@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 
 # Lade .env Variablen von gpt_backend Verzeichnis
-load_dotenv(dotenv_path="../../.env")
+load_dotenv(dotenv_path="../.env")
 
 # Hole die MongoDB URI aus den Umgebungsvariablen
 DATABASE_URL = os.getenv("DATABASE_URL")

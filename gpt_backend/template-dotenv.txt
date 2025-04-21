@@ -1,7 +1,7 @@
 # non secret environment variables
 
 # my microservice
-DATABASE_URL=sqllite:///./auth.db
+DATABASE_URL=sqlite:///./auth.db
 KONG_ADMIN_URL=http://kong-gateway:8001/consumers
 
 # mongo db
