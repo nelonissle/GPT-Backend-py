@@ -5,7 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import Session
-from app.database import get_sql_db, get_mongo_db, Base
+from app.database import get_mongo_db, Base
+import httpx
 
 # --- JWT setup ---
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -37,9 +38,25 @@ class User(Base):
     "/admin/users",
     dependencies=[Depends(verify_developer_token)]
 )
-async def list_users(db: Session = Depends(get_sql_db)):
-    users = db.query(User.id, User.username, User.role).all()
-    return [{"id": u.id, "username": u.username, "role": u.role} for u in users]
+async def list_users():
+    """
+    Fetch the list of users from auth_service via Kong.
+    """
+    auth_service_url = os.getenv("AUTH_SERVICE_URL")
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{auth_service_url}/users")
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"Failed to fetch users: {response.text}"
+                )
+            return response.json()
+    except httpx.RequestError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error communicating with auth_service: {str(e)}"
+        )
 
 # DELETE USER
 @router.delete(
@@ -49,17 +66,27 @@ async def list_users(db: Session = Depends(get_sql_db)):
 )
 async def delete_user(
     username: str,
-    db: Session = Depends(get_sql_db),
-    mongo_db = Depends(get_mongo_db)
+    mongo_db=Depends(get_mongo_db)
 ):
-    # 1) remove from SQLite
-    db_user = db.query(User).filter(User.username == username).first()
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    db.delete(db_user)
-    db.commit()
+    # 1) Remove user via auth_service
+    auth_service_url = os.getenv("AUTH_SERVICE_URL")
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.delete(f"{auth_service_url}/users/{username}")
+            if response.status_code == 404:
+                raise HTTPException(status_code=404, detail="User not found")
+            elif response.status_code != 204:
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"Failed to delete user: {response.text}"
+                )
+    except httpx.RequestError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error communicating with auth_service: {str(e)}"
+        )
 
-    # 2) drop their Mongo collection (all chats)
+    # 2) Drop their MongoDB collection (all chats)
     if username in mongo_db.list_collection_names():
         mongo_db.drop_collection(username)
 

@@ -76,3 +76,16 @@ async def login(user: UserLogin, db: Session = Depends(get_db)):
 async def get_all_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
     return [{"id": user.id, "username": user.username, "role": user.role} for user in users]
+
+@router.delete("/users/{username}", status_code=204)
+async def delete_user(username: str, db: Session = Depends(get_db)):
+    """
+    Deletes a user by their username.
+    """
+    db_user = db.query(User).filter(User.username == username).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    db.delete(db_user)
+    db.commit()
+    return

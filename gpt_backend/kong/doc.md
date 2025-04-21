@@ -83,43 +83,6 @@ Kopieren
 Bearbeiten
 curl -i -X POST http://localhost:8001/routes/admin_route/plugins --data name=jwt --data 'config.claims_to_verify[]=exp'
 
-
-
-## Beispiel für kong config DB off
-```yml
-_format_version: "3.0"
-
-services:
-- name: auth_service
-  url: http://auth_service:8002/auth
-  routes:
-  - name: auth
-    paths:
-    - /auth
-
-- name: chat_service
-  url: http://chat_service:8003/chat 
-  routes:
-  - name: chat
-    paths:
-    - /chat
-    plugins:
-    - name: jwt
-      config:
-        claims_to_verify:
-        - exp
-        secret_is_base64: false
-        key_claim_name: sub    # Hier wird der "sub"-Claim zur Identifikation genutzt
-
-consumers:
-- username: testuser
-  jwt_secrets:
-  - key: testkey
-    secret: 084I8UAP68F-gNpJQWJX5_ftpw9aBKXBNO4NZVVCeI0
-```
-
-
-
 Kong Monitoring 
 Promethues setup:
 curl -s -X POST http://localhost:8001/plugins --data "name=prometheus" --data "config.scrape_interval=5" --data "config.path=/metrics"

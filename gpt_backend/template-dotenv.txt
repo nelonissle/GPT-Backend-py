@@ -4,6 +4,9 @@
 DATABASE_URL=sqlite:///./auth.db
 KONG_ADMIN_URL=http://kong-gateway:8001/consumers
 
+# admin access
+AUTH_SERVICE_URL=http://kong-gateway:8000/auth
+
 # mongo db
 MONGO_INITDB_ROOT_USERNAME=mongoadmin
 MONGO_SERVICE_HOST=mongo_db
