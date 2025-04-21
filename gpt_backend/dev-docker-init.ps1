@@ -9,4 +9,4 @@ Copy-Item -Path "template-dotenv-secrets.txt" -Destination ".env" -Force
 Get-Content -Path "template-dotenv.txt" | Add-Content -Path ".env"
 
 # Start Docker Compose
-docker-compose up -d
+#docker-compose up -d
