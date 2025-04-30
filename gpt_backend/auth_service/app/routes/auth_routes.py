@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+import jwt
 from app.database import get_db
 from app.models.user import User
 from app.utils.jwt_helper import create_access_token
@@ -8,6 +10,19 @@ from app.utils.password_utils import hash_password, verify_password, is_valid_pa
 from app.utils.kong_consumer import create_kong_consumer, create_kong_jwt_credentials
 
 router = APIRouter()
+
+security = HTTPBearer()
+
+def verify_developer_token(
+    creds: HTTPAuthorizationCredentials = Depends(security)
+):
+    try:
+        payload = jwt.decode(creds.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    if payload.get("role") != "developer":
+        raise HTTPException(status_code=403, detail="Developer role required")
+    return payload
 
 class UserRegister(BaseModel):
     username: str
@@ -72,12 +87,15 @@ async def login(user: UserLogin, db: Session = Depends(get_db)):
     access_token = create_access_token(data={"sub": db_user.username, "role": db_user.role})
     return {"message": "Login successful.", "access_token": access_token, "token_type": "bearer"}
 
-@router.get("/users")
+@router.get("/users", dependencies=[Depends(verify_developer_token)])
 async def get_all_users(db: Session = Depends(get_db)):
+    """
+    Fetch all users from the database.
+    """
     users = db.query(User).all()
     return [{"id": user.id, "username": user.username, "role": user.role} for user in users]
 
-@router.delete("/users/{username}", status_code=204)
+@router.delete("/users/{username}", status_code=204, dependencies=[Depends(verify_developer_token)])
 async def delete_user(username: str, db: Session = Depends(get_db)):
     """
     Deletes a user by their username.
