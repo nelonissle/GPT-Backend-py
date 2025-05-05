@@ -1,7 +1,7 @@
 import os
 import jwt
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import Session
@@ -38,14 +38,16 @@ class User(Base):
     "/admin/users",
     dependencies=[Depends(verify_developer_token)]
 )
-async def list_users():
-    """
-    Fetch the list of users from auth_service via Kong.
-    """
+async def list_users(request: Request):
     auth_service_url = os.getenv("AUTH_SERVICE_URL")
+    token = request.headers.get("authorization")
+
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{auth_service_url}/users")
+            response = await client.get(
+                f"{auth_service_url}/users",
+                headers={"Authorization": token}
+            )
             if response.status_code != 200:
                 raise HTTPException(
                     status_code=response.status_code,
@@ -64,15 +66,17 @@ async def list_users():
     dependencies=[Depends(verify_developer_token)],
     status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete_user(
-    username: str,
-    mongo_db=Depends(get_mongo_db)
-):
-    # 1) Remove user via auth_service
+async def delete_user(username: str, request: Request, mongo_db=Depends(get_mongo_db)):
     auth_service_url = os.getenv("AUTH_SERVICE_URL")
+    token = request.headers.get("authorization")
+
+    # 1) Remove user via auth_service
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.delete(f"{auth_service_url}/users/{username}")
+            response = await client.delete(
+                f"{auth_service_url}/users/{username}",
+                headers={"Authorization": token}
+            )
             if response.status_code == 404:
                 raise HTTPException(status_code=404, detail="User not found")
             elif response.status_code != 204:
@@ -97,7 +101,7 @@ async def delete_user(
     "/admin/users/{username}/chats",
     dependencies=[Depends(verify_developer_token)]
 )
-async def list_user_chats(username: str, mongo_db = Depends(get_mongo_db)):
+async def list_user_chats(username: str, mongo_db=Depends(get_mongo_db)):
     if username not in mongo_db.list_collection_names():
         raise HTTPException(status_code=404, detail="User not found")
     coll = mongo_db[username]
@@ -116,11 +120,7 @@ async def list_user_chats(username: str, mongo_db = Depends(get_mongo_db)):
     dependencies=[Depends(verify_developer_token)],
     status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete_user_chat(
-    username: str,
-    chat_id: str,
-    mongo_db = Depends(get_mongo_db)
-):
+async def delete_user_chat(username: str, chat_id: str, mongo_db=Depends(get_mongo_db)):
     if username not in mongo_db.list_collection_names():
         raise HTTPException(status_code=404, detail="User not found")
     coll = mongo_db[username]
@@ -134,7 +134,7 @@ async def delete_user_chat(
     "/admin/users/{username}/chats/{chat_id}",
     dependencies=[Depends(verify_developer_token)]
 )
-async def get_user_chat(username: str, chat_id: str, mongo_db = Depends(get_mongo_db)):
+async def get_user_chat(username: str, chat_id: str, mongo_db=Depends(get_mongo_db)):
     if username not in mongo_db.list_collection_names():
         raise HTTPException(status_code=404, detail="User not found")
     coll = mongo_db[username]

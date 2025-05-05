@@ -95,8 +95,6 @@ services:
       - "8004:8004"
     env_file:
       - ./.env
-    volumes:
-      - ./auth_service/auth_service.db:/data/auth_service.db:rw
     networks:
       - gpt_backend_network
     depends_on:

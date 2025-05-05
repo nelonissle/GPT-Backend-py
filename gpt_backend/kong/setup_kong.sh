@@ -18,11 +18,14 @@ echo "🔀 Creating route for chat_service..."
 curl -s -X POST "http://localhost:8001/services/chat_service/routes" \
 --data "paths[]=/chat"
 
-echo "🔎 Getting routes to extract Chat route ID..."
-CHAT_ROUTE_ID=$(curl -s http://localhost:8001/routes | jq -r '.data[] | select(.paths[]? == "/chat") | .id')
+echo "🔎 Please enter the Chat route ID (use: curl http://localhost:8001/routes to find it):"
+curl http://localhost:8001/routes
+
+echo "🔎 Please enter the Chat route ID (use: curl http://localhost:8001/routes to find it):"
+read CHAT_ROUTE_ID
 
 if [ -z "$CHAT_ROUTE_ID" ]; then
-  echo "❌ Could not find route ID for /chat"
+  echo "❌ No route ID provided for /chat. Exiting."
   exit 1
 fi
 
