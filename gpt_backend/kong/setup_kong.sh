@@ -59,3 +59,9 @@ curl -s -X POST http://localhost:8001/plugins \
 --data "config.path=/metrics"
 
 echo "✅ Kong configuration complete!"
+
+echo "Shows all registered plugins:"
+curl http://localhost:8001/plugins
+
+echo "Shows all registered services:"
+curl http://localhost:8001/services
