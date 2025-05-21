@@ -1,8 +1,8 @@
 @Kong_GatewayAddress = http://localhost:8000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjMxIiwicm9sZSI6IiIsImlzcyI6InRlc3R1c2VyMzEiLCJpYXQiOjE3NDY0NDkxNzksImV4cCI6MTc0NjcwODM3OSwianRpIjoiOWQxNjAxMTUtMjY5Ni00ZmYwLTk2MmEtNTAxYzgxYTcyOTkxIn0.-sh-3G0a8RO26DVaclyYN4E-Z0TYn3skhdpKnXL28gY
-@dev_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjMwIiwicm9sZSI6ImRldmVsb3BlciIsImlzcyI6InRlc3R1c2VyMzAiLCJpYXQiOjE3NDY0NDkxMjUsImV4cCI6MTc0NjcwODMyNSwianRpIjoiNGI3ZDIyZGUtODgwYS00OTM3LWJiZGQtNzViOTQ1YzRiNjk3In0.ZANyjkkMAnSTKYm3liwvG8mGKAexln1GDa-OcOCLYiY
-@chatId = 6818b35c3a74bfa276caa611
-@username = testuser31
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjM1Iiwicm9sZSI6ImRldmVsb3BlciIsImlzcyI6InRlc3R1c2VyMzUiLCJpYXQiOjE3NDc4MzgzNjgsImV4cCI6MTc0ODA5NzU2OCwianRpIjoiNDIxMjRhYjAtMjM1YS00MjRjLTk0NjUtOWNkOWNiZTgwNzZkIn0.WTSD3hPnszqGV7dd09itv6Eo41irm784kKiHqXw4Tag
+@dev_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjMyIiwicm9sZSI6ImRldmVsb3BlciIsImlzcyI6InRlc3R1c2VyMzIiLCJpYXQiOjE3NDc4MzQxODAsImV4cCI6MTc0ODA5MzM4MCwianRpIjoiOTg5MmM4MDktMWRkZC00ZjRhLWJlMzYtODY5Nzc0NjdlMWE0In0.WYtbcVORErIGHOgLDjSmFu15Kq_GPJRvcHEYTsHQqMU
+@chatId = 682df0bc795c27ef0b57086b
+@username = testuser35
 
 
 ### Test: Registrierung eines neuen Users über den Kong-Gateway
@@ -10,9 +10,9 @@ POST {{Kong_GatewayAddress}}/auth/register HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "testuser31",
+  "username": "testuser35",
   "password": "VeryStrongPassword123!@",
-  "role": ""
+  "role": "developer"
 }
 
 ### Test: Login mit dem neuen User (über den Kong-Gateway)
@@ -20,7 +20,7 @@ POST {{Kong_GatewayAddress}}/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "testuser28",
+  "username": "testuser33",
   "password": "VeryStrongPassword123!@"
 }
 
@@ -34,9 +34,12 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "initial_query": "Hallo, dies ist mein erster Testchat",
-  "llm_response": "Dummy-Antwort des LLM."
+  "initial_query": "Hallo, dies ist mein erster Testchat"
+  
 }
+
+
+### "llm_response": "Dummy-Antwort des LLM."
 
 ### → Antwort: {"message":"Neuer Chat erstellt","chat_id":"<SET THIS AS {{chatId}}>"}  
 
@@ -108,4 +111,5 @@ Authorization: Bearer {{dev_token}}
 ### I. Developer‑Token: Confirm user deletion (should return 404)
 GET {{Kong_GatewayAddress}}/admin/users/{{username}}/chats HTTP/1.1
 Authorization: Bearer {{dev_token}}
+ 
  

@@ -1,5 +1,11 @@
 # non secret environment variables
 
+# ollama 
+OLLAMA_MODEL=llama3
+#OLLAMA_API_URL=http://ollama:11434
+
+AUTH_SERVICE_URL=http://kong-gateway:8000/auth
+
 # my microservice
 DATABASE_URL=sqlite:///./auth.db
 KONG_ADMIN_URL=http://kong-gateway:8001/consumers

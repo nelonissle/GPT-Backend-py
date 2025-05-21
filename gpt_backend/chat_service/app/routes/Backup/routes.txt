@@ -1,5 +1,7 @@
-from datetime import datetime
+# app/routes/chat_routes.py
+
 import os
+from datetime import datetime
 from bson import ObjectId
 import jwt
 from fastapi import APIRouter, HTTPException, Depends
@@ -7,7 +9,6 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from typing import Optional
 from app.database import get_db
-from app.services.ollama_llm import get_llm_response  # Import the function to interact with Ollama
 
 # JWT-Konfiguration (soll mit dem Auth-Service übereinstimmen)
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -29,6 +30,7 @@ def verify_token(token: str):
 # Pydantic-Modelle
 class NewChatRequest(BaseModel):
     initial_query: str  # Die erste Benutzeranfrage
+    llm_response: str   # Die Antwort des LLM (zum Testen vorläufig Dummy-Daten)
 
 class ChatMessageInput(BaseModel):
     chat_id: Optional[str] = None  # Falls nicht angegeben, wird der aktivste Chat verwendet
@@ -49,7 +51,6 @@ async def new_chat(request: NewChatRequest, credentials: HTTPAuthorizationCreden
 
     # Zusammenstellen des Chat-Dokuments
     now = datetime.utcnow()
-    llm_response = get_llm_response(request.initial_query)  # Get response from Ollama
     chat_doc = {
         "chat_name": chat_name,
         "timestamp": now,
@@ -61,7 +62,7 @@ async def new_chat(request: NewChatRequest, credentials: HTTPAuthorizationCreden
             },
             {
                 "role": "llm",
-                "text": llm_response,
+                "text": request.llm_response,
                 "timestamp": now
             }
         ]

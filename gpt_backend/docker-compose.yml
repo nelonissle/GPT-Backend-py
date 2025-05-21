@@ -187,6 +187,8 @@ services:
     networks:
       - gpt_backend_network
     restart: always
+    environment:
+      - OLLAMA_MODELS=llama3
 
 volumes:
   mongo_data:
