@@ -7,6 +7,7 @@ from pymongo import MongoClient
 Base = declarative_base()
 
 # .env laden
+# Load .env from project root
 load_dotenv(dotenv_path="../.env")
 
 # MongoDB-Setup
