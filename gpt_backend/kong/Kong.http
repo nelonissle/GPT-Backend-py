@@ -1,7 +1,7 @@
 @Kong_GatewayAddress = http://localhost:8000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjM1Iiwicm9sZSI6ImRldmVsb3BlciIsImlzcyI6InRlc3R1c2VyMzUiLCJpYXQiOjE3NDc4MzgzNjgsImV4cCI6MTc0ODA5NzU2OCwianRpIjoiNDIxMjRhYjAtMjM1YS00MjRjLTk0NjUtOWNkOWNiZTgwNzZkIn0.WTSD3hPnszqGV7dd09itv6Eo41irm784kKiHqXw4Tag
-@dev_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjMyIiwicm9sZSI6ImRldmVsb3BlciIsImlzcyI6InRlc3R1c2VyMzIiLCJpYXQiOjE3NDc4MzQxODAsImV4cCI6MTc0ODA5MzM4MCwianRpIjoiOTg5MmM4MDktMWRkZC00ZjRhLWJlMzYtODY5Nzc0NjdlMWE0In0.WYtbcVORErIGHOgLDjSmFu15Kq_GPJRvcHEYTsHQqMU
-@chatId = 682df0bc795c27ef0b57086b
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjMzIiwicm9sZSI6ImRldmVsb3BlciIsImlzcyI6InRlc3R1c2VyMzMiLCJpYXQiOjE3NDg0Njc0NTIsImV4cCI6MTc0ODcyNjY1MiwianRpIjoiOTdhYWUxNmItZDczYy00NWZhLWI3MTctNDRlMTE0ZGUwYjYwIn0.sKJmC-z8dcuwEiwLA5UnO6ql5wNa9KdjmZopFavvqR4
+@dev_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjM2Iiwicm9sZSI6ImRldmVsb3BlciIsImlzcyI6InRlc3R1c2VyMzYiLCJpYXQiOjE3NDg0NjY1MzMsImV4cCI6MTc0ODcyNTczMywianRpIjoiOWVjM2VhNzgtNDlmZS00NGFlLWFiZWItYTE5YjZiYjczZjM0In0.o_8FrhdMOkjd3sPbRqwyppBvWxP90RIhPP8Ig1YdhxI
+@chatId = 682df0f5795c27ef0b57086c
 @username = testuser35
 
 
@@ -10,7 +10,7 @@ POST {{Kong_GatewayAddress}}/auth/register HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "testuser35",
+  "username": "testuser36",
   "password": "VeryStrongPassword123!@",
   "role": "developer"
 }
@@ -20,7 +20,7 @@ POST {{Kong_GatewayAddress}}/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "testuser33",
+  "username": "testuser35",
   "password": "VeryStrongPassword123!@"
 }
 
