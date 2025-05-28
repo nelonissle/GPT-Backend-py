@@ -124,6 +124,7 @@ jobs:
         working-directory: ./gpt_backend/chat_service
         env:
           MONGO_SERVICE_HOST: localhost
+          MONGO_SERVICE_PORT: "27017"
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
