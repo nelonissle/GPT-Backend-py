@@ -79,10 +79,12 @@ jobs:
 
       - name: Install dependencies and test auth_service
         working-directory: ./gpt_backend/auth_service
+        env:
+          DATABASE_URL: "sqlite:///:memory:"  # or your test DB URL
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pytest  # || true
+          pytest
 
   build-chat:
     runs-on: ubuntu-latest
@@ -119,7 +121,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pytest # || true
+          pytest 
 
   deploy:
     needs: [test-admin, test-auth, test-chat]
