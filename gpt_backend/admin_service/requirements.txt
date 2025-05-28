@@ -6,3 +6,4 @@ pymongo
 PyJWT
 python-multipart
 httpx
+pytest
