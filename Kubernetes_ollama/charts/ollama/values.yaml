@@ -1,0 +1,45 @@
+# values.yaml
+
+# number of replicas
+replicaCount: 1
+
+# container image settings
+image:
+  repository: ollama/ollama
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# which model to load
+model: llama3
+
+# service settings (also drives containerPort & ingress backend port)
+service:
+  type: ClusterIP
+  port: 11434
+
+# ingress settings
+ingress:
+  enabled: true
+  className: ""           # e.g. "nginx" or leave empty
+  annotations: {}         # any ingress annotations you need
+  hosts:
+    - host: ollama.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []                 # e.g. [{ hosts: [ ... ], secretName: ... }]
+
+# persistence settings
+persistence:
+  enabled: true
+  size: 10Gi
+  storageClass: ""        # leave blank for default
+
+# scheduling & placement
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# override chart name templates if you like
+nameOverride: ""
+fullnameOverride: ""

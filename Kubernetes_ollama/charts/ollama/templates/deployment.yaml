@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ollama.fullname" . }}
+  labels:
+    {{- include "ollama.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "ollama.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "ollama.name" . }}
+        {{- include "ollama.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{ toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+        {{ toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: ollama
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+          env:
+            - name: OLLAMA_MODELS
+              value: "{{ .Values.model }}"
+          {{- if .Values.persistence.enabled }}
+          volumeMounts:
+            - name: {{ include "ollama.fullname" . }}-data
+              mountPath: /root/.ollama
+          {{- end }}
+      {{- if .Values.persistence.enabled }}
+      volumes:
+        - name: {{ include "ollama.fullname" . }}-data
+          persistentVolumeClaim:
+            claimName: {{ include "ollama.fullname" . }}-data
+      {{- end }}
