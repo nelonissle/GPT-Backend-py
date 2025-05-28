@@ -18,12 +18,23 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Lint with flake8
+        working-directory: ./gpt_backend/admin_service
+        run: |
+          pip install flake8
+          flake8 .
+
+      - name: Security scan with safety
+        working-directory: ./gpt_backend/admin_service
+        run: |
+          pip install safety
+          safety check -r requirements.txt
+
       - name: Install dependencies and build admin_service
         working-directory: ./gpt_backend/admin_service
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          # Add your build commands here, e.g., python setup.py install
 
   test-admin:
     needs: build-admin
@@ -42,7 +53,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pytest || true 
+          pytest || true
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   build-auth:
     runs-on: ubuntu-latest
@@ -55,12 +74,23 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Lint with flake8
+        working-directory: ./gpt_backend/auth_service
+        run: |
+          pip install flake8
+          flake8 .
+
+      - name: Security scan with safety
+        working-directory: ./gpt_backend/auth_service
+        run: |
+          pip install safety
+          safety check -r requirements.txt
+
       - name: Install dependencies and build auth_service
         working-directory: ./gpt_backend/auth_service
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          # Add your build commands here, e.g., python setup.py install
 
   test-auth:
     needs: build-auth
@@ -85,6 +115,14 @@ jobs:
           pip install -r requirements.txt
           pytest
 
+      - name: Notify Slack on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
   build-chat:
     runs-on: ubuntu-latest
     steps:
@@ -96,12 +134,23 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Lint with flake8
+        working-directory: ./gpt_backend/chat_service
+        run: |
+          pip install flake8
+          flake8 .
+
+      - name: Security scan with safety
+        working-directory: ./gpt_backend/chat_service
+        run: |
+          pip install safety
+          safety check -r requirements.txt
+
       - name: Install dependencies and build chat_service
         working-directory: ./gpt_backend/chat_service
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          # Add your build commands here, e.g., python setup.py install
 
   test-chat:
     needs: build-chat
@@ -109,8 +158,12 @@ jobs:
     services:
       mongo:
         image: mongo:6
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: example
         ports:
           - 27017:27017
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -125,13 +178,31 @@ jobs:
         env:
           MONGO_SERVICE_HOST: localhost
           MONGO_SERVICE_PORT: "27017"
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: example
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pytest 
+          pytest
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  deploy-staging:
+    needs: [test-admin, test-auth, test-chat]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      # your staging deploy steps here
 
   deploy:
-    needs: [test-admin, test-auth, test-chat]
+    needs: deploy-staging
     runs-on: ubuntu-latest
     permissions:
       packages: write
