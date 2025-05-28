@@ -26,9 +26,7 @@ jobs:
         working-directory: ./gpt_backend/admin_service
         run: |
           pip install flake8
-          flake8 \
-            --max-line-length 120 \
-            --ignore E302,E305,E402,E501,F401,W292,W293,E221,E241 .
+          flake8 --max-line-length 120 --ignore E302,E305,E402,E501,F401,W292,W293,E221,E241 .
 
       - name: Security scan with safety
         working-directory: ./gpt_backend/admin_service
@@ -92,9 +90,7 @@ jobs:
         working-directory: ./gpt_backend/auth_service
         run: |
           pip install flake8
-          flake8 \
-            --max-line-length 120 \
-            --ignore E302,E305,E402,E501,F401,W292,W293,E221,E241 .
+          flake8 --max-line-length 120 --ignore E302,E305,E402,E501,F401,W292,W293,E221,E241 .
 
       - name: Security scan with safety
         working-directory: ./gpt_backend/auth_service
@@ -162,9 +158,7 @@ jobs:
         working-directory: ./gpt_backend/chat_service
         run: |
           pip install flake8
-          flake8 \
-            --max-line-length 120 \
-            --ignore E302,E305,E402,E501,F401,W292,W293,E221,E241 .
+          flake8 --max-line-length 120 --ignore E302,E305,E402,E501,F401,W292,W293,E221,E241 .
 
       - name: Security scan with safety
         working-directory: ./gpt_backend/chat_service
@@ -241,6 +235,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      # ← NEW: enable QEMU for multi-arch & BuildKit container driver
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: all
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver: docker-container
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
