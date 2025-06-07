@@ -19,3 +19,14 @@ service:
 
 secrets:
   KONG_PG_PASSWORD: ""
+
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}
+  hosts:
+    - host: kong.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
