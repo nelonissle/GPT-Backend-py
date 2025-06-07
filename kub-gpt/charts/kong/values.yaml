@@ -12,3 +12,6 @@ postgresHost: "postgres"      # The name of your Postgres service
 postgresUser: "kong"
 postgresDB: "kong"
 # KONG_PG_PASSWORD should be set via secret
+
+secrets:
+  KONG_PG_PASSWORD: ""
