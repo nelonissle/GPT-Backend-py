@@ -9,10 +9,16 @@ service:
   type: ClusterIP
   port: 27017
 
-env: []
-  # - name: MONGO_INITDB_ROOT_USERNAME
-  #   value: "root"
-  # - name: MONGO_INITDB_ROOT_PASSWORD
-  #   value: "example"
+env:
+  - name: MONGO_INITDB_ROOT_USERNAME
+    value: "root"
+  - name: MONGO_INITDB_ROOT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: mongo-secrets
+        key: MONGO_INITDB_ROOT_PASSWORD
 
 resources: {}
+
+secrets:
+  MONGO_INITDB_ROOT_PASSWORD: ""

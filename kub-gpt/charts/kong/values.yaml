@@ -20,3 +20,7 @@ service:
 ingress:
   enabled: true
   host: kong.local
+
+secrets:
+  KONG_PG_PASSWORD: ""
+  POSTGRES_PASSWORD: ""

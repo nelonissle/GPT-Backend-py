@@ -1,4 +1,4 @@
 apiVersion: v2
-name: skybooker
-description: Umbrella Chart for SkyBooker Microservices
+name: gpt
+description: Umbrella Chart for GPT Microservices
 version: 0.1.0

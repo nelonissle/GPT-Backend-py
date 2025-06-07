@@ -23,3 +23,8 @@ spec:
             - name: {{ .name }}
               value: {{ .value | quote }}
             {{- end }}
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: admin-service-secrets
+                  key: SECRET_KEY

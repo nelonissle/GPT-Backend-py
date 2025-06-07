@@ -4,23 +4,21 @@ metadata:
   name: global-config
   namespace: gpt
 data:
-  IMAGE_PULL_POLICY: "IfNotPresent"
+  IMAGE_PULL_POLICY: "Always"
   LOG_PATH: "/app/logs"
   DATA_PATH: "/app/data"
- 
-  SQLITE_CONNECTION: "Data Source=file:data/AuthService.db"
 
-  MARIADB_DATABASE: "BookingDB"
-  MARIADB_USER: "skybooker"
-
+  # MongoDB
   MONGO_USERNAME: "mongoadmin"
   MONGO_INITDB_ROOT_USERNAME: "mongoadmin"
-  MONGO_DATABASE_NAME: "FlightDb"
+  MONGO_DATABASE_NAME: "gptdb"
 
-  RABBITMQ_DEFAULT_USER: "guest"
+  # Kong/Postgres
+  KONG_PG_USER: "kong"
+  KONG_PG_DATABASE: "kong"
 
-  FLIGHTSERVICE_PORT: "8001"
-  BOOKINGSERVICE_PORT: "8002"
-  AUTHSERVICE_PORT: "8003"
-  OCELOTAPIGATEWAY_PORT: "8000"
-  MESSAGINGSERVICE_PORT: "8004"
+  # Microservices ports
+  ADMIN_SERVICE_PORT: "8004"
+  AUTH_SERVICE_PORT: "8002"
+  CHAT_SERVICE_PORT: "8003"
+  KONG_PROXY_PORT: "8000"

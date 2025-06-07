@@ -23,3 +23,23 @@ spec:
             - name: {{ .name }}
               value: {{ .value | quote }}
             {{- end }}
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: admin-service-secrets
+                  key: SECRET_KEY
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: admin-service-secrets
+                  key: MONGO_INITDB_ROOT_PASSWORD
+            - name: KONG_PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: admin-service-secrets
+                  key: KONG_PG_PASSWORD
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: admin-service-secrets
+                  key: POSTGRES_PASSWORD

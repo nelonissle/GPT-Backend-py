@@ -17,7 +17,10 @@ spec:
             - name: KONG_PG_USER
               value: {{ .Values.postgres.user | quote }}
             - name: KONG_PG_PASSWORD
-              value: {{ .Values.postgres.password | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: kong-secrets
+                  key: KONG_PG_PASSWORD
             - name: KONG_PG_DATABASE
               value: {{ .Values.postgres.db | quote }}
       restartPolicy: OnFailure

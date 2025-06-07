@@ -9,11 +9,31 @@ service:
   type: ClusterIP
   port: 8003
 
-env: []
-  # - name: EXAMPLE_ENV
-  #   value: "value"
+env:
+  - name: DATABASE_URL
+    value: "mongodb://mongo_db:27017"
+  - name: AUTH_SERVICE_URL
+    value: "http://kong-gateway:8000/auth"
+  - name: KONG_ADMIN_URL
+    value: "http://kong-gateway:8001/consumers"
+  - name: OLLAMA_MODEL
+    value: "llama3"
+  # - name: OLLAMA_API_URL
+  #   value: "http://ollama:11434"
+  - name: MONGO_INITDB_ROOT_USERNAME
+    value: "mongoadmin"
+  - name: MONGO_SERVICE_HOST
+    value: "mongo_db"
+  - name: MONGO_SERVICE_PORT
+    value: "27017"
 
 resources: {}
 ingress:
   enabled: true
   host: chat.local
+
+secrets:
+  SECRET_KEY: ""
+  MONGO_INITDB_ROOT_PASSWORD: ""
+  KONG_PG_PASSWORD: ""
+  POSTGRES_PASSWORD: ""

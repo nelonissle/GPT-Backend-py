@@ -23,6 +23,11 @@ spec:
             - name: {{ .name }}
               value: {{ .value | quote }}
             {{- end }}
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secrets
+                  key: MONGO_INITDB_ROOT_PASSWORD
           volumeMounts:
             - name: logs
               mountPath: /app/logs

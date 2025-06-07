@@ -164,3 +164,8 @@ cython_debug/
 .env
 *.env
 auth_service.db
+/kub-gpt/charts/auth-service/templates/secret.yaml
+/kub-gpt/charts/admin-service/templates/secret.yaml
+/kub-gpt/charts/chat-service/templates/secret.yaml
+/kub-gpt/charts/kong/templates/secret.yaml
+/kub-gpt/charts/mongo/templates/secret.yaml
