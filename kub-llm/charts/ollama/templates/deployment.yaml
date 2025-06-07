@@ -1,33 +1,53 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ollama
+  name: {{ include "ollama.fullname" . }}
   labels:
-    app: ollama
+    {{- include "ollama.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: ollama
+      app: {{ include "ollama.name" . }}
   template:
     metadata:
       labels:
-        app: ollama
+        app: {{ include "ollama.name" . }}
+        {{- include "ollama.labels" . | nindent 8 }}
     spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{ toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+        {{ toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
       containers:
         - name: ollama
-          image: ollama/ollama:latest
-          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 11434
+              containerPort: {{ .Values.service.port }}
           env:
             - name: OLLAMA_MODELS
-              value: "llama3"
+              value: "{{ .Values.model }}"
+          resources:
+            limits:
+              nvidia.com/gpu: 1   # Request 1 GPU
+          {{- if .Values.persistence.enabled }}
           volumeMounts:
-            - name: ollama-data
+            - name: {{ include "ollama.fullname" . }}-data
               mountPath: /root/.ollama
+          {{- end }}
+      {{- if .Values.persistence.enabled }}
       volumes:
-        - name: ollama-data
+        - name: {{ include "ollama.fullname" . }}-data
           persistentVolumeClaim:
-            claimName: ollama-data
+            claimName: {{ include "ollama.fullname" . }}-data
+      {{- end }}

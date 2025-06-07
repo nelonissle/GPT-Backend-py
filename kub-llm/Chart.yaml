@@ -1,4 +1,10 @@
 apiVersion: v2
-name: skybooker
-description: Umbrella Chart for SkyBooker Microservices
+name: ollama
+description: Ollama LLM Service
+type: application
 version: 0.1.0
+appVersion: "latest"
+dependencies:
+  - name: ollama
+    version: "x.x.x"
+    repository: "https://your.repo.url/"
