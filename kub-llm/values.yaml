@@ -1,0 +1,11 @@
+# values.yaml
+
+namespace:
+  name: llm
+  environment: dev
+  app: GPT-Backend
+
+
+ollama:
+# number of replicas
+  replicaCount: 1

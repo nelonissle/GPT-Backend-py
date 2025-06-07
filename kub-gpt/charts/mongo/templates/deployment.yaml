@@ -30,7 +30,7 @@ spec:
                   key: MONGO_INITDB_ROOT_PASSWORD
           volumeMounts:
             - name: logs
-              mountPath: /app/logs
+              mountPath: /app/mongodb
       volumes:
         - name: logs
           hostPath:
