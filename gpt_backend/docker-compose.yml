@@ -64,7 +64,8 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./auth_service:/app
+      - authdb_data:/app/data
+      - logs_data:/app/logs
     networks:
       - gpt_backend_network
     depends_on:
@@ -80,7 +81,7 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./chat_service:/app
+      - logs_data:/app/logs
     networks:
       - gpt_backend_network
     depends_on:
@@ -95,6 +96,8 @@ services:
       - "8004:8004"
     env_file:
       - ./.env
+    volumes:
+      - logs_data:/app/logs
     networks:
       - gpt_backend_network
     depends_on:
@@ -201,6 +204,8 @@ volumes:
   loki_wal:
   loki_compactor:
   ollama_data:
+  authdb_data:
+  logs_data:
 
 networks:
   gpt_backend_network:

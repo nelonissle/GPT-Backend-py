@@ -13,14 +13,14 @@ spec:
             - name: KONG_DATABASE
               value: "postgres"
             - name: KONG_PG_HOST
-              value: kong-database
+              value: {{ .Values.postgresHost | quote }}
             - name: KONG_PG_USER
-              value: {{ .Values.postgres.user | quote }}
+              value: {{ .Values.postgresUser | quote }}
             - name: KONG_PG_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: kong-secrets
                   key: KONG_PG_PASSWORD
             - name: KONG_PG_DATABASE
-              value: {{ .Values.postgres.db | quote }}
+              value: {{ .Values.postgresDB | quote }}
       restartPolicy: OnFailure

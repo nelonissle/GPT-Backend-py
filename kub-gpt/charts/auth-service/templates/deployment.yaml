@@ -28,3 +28,15 @@ spec:
                 secretKeyRef:
                   name: admin-service-secrets
                   key: SECRET_KEY
+          volumeMounts:
+            - name: sqlite-db
+              mountPath: /app/data
+            - name: logs
+              mountPath: /app/logs  
+      volumes:
+        - name: sqlite-db
+          persistentVolumeClaim:
+            claimName: {{ include "auth-service.fullname" . }}-pvc
+        - name: logs
+          persistentVolumeClaim:
+            claimName: {{ include "auth-service.fullname" . }}-logs

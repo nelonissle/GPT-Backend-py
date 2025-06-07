@@ -1,26 +1,14 @@
-postgres:
-  image: postgres:14
-  user: kong
-  password: kong
-  db: kong
-
 kong:
   image: kong:latest
-  adminPort: 8001
   proxyPort: 8000
-  adminSSLPort: 8444
+  adminPort: 8001
   proxySSLPort: 8443
+  adminSSLPort: 8444
 
 migrations:
   image: kong:latest
 
-service:
-  type: ClusterIP
-
-ingress:
-  enabled: true
-  host: kong.local
-
-secrets:
-  KONG_PG_PASSWORD: ""
-  POSTGRES_PASSWORD: ""
+postgresHost: "postgres"      # The name of your Postgres service
+postgresUser: "kong"
+postgresDB: "kong"
+# KONG_PG_PASSWORD should be set via secret

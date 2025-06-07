@@ -17,5 +17,7 @@ COPY ./app /app
 # Port freigeben
 EXPOSE 8003
 
+VOLUME ["/app/logs"]
+
 # Anwendung mit uvicorn starten
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8003"]

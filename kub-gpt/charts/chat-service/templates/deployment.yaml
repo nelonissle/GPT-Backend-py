@@ -43,3 +43,12 @@ spec:
                 secretKeyRef:
                   name: chat-service-secrets
                   key: POSTGRES_PASSWORD
+          volumeMounts:
+            # other mounts if any
+            - name: logs
+              mountPath: /app/logs   # adjust if your app writes logs elsewhere
+      volumes:
+        # other volumes if any
+        - name: logs
+          persistentVolumeClaim:
+            claimName: {{ include "chat-service.fullname" . }}-logs

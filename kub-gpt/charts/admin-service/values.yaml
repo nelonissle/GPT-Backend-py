@@ -28,3 +28,7 @@ secrets:
   MONGO_INITDB_ROOT_PASSWORD: ""
   KONG_PG_PASSWORD: ""
   POSTGRES_PASSWORD: ""
+
+logsPersistence:
+  enabled: true
+  size: 1Gi

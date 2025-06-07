@@ -1,0 +1,12 @@
+{{- if .Values.logsPersistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "auth-service.fullname" . }}-logs
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.logsPersistence.size }}
+{{- end }}

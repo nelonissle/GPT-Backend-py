@@ -29,10 +29,9 @@ spec:
                   name: mongo-secrets
                   key: MONGO_INITDB_ROOT_PASSWORD
           volumeMounts:
-            - name: logs
-              mountPath: /app/mongodb
+            - name: mongo-data
+              mountPath: /data/db
       volumes:
-        - name: logs
-          hostPath:
-            path: /app/logs
-            type: DirectoryOrCreate
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: {{ include "mongo.fullname" . }}-data

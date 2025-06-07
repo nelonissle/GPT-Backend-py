@@ -15,4 +15,6 @@ COPY ./app ./app
 EXPOSE 8004
 ENV PYTHONUNBUFFERED=1
 
+VOLUME ["/app/logs"]
+
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8004"]

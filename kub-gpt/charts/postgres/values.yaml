@@ -1,0 +1,17 @@
+image:
+  repository: postgres
+  tag: "14"
+  pullPolicy: IfNotPresent
+
+postgres:
+  user: kong
+  password: kongpassword
+  db: kong
+
+service:
+  type: ClusterIP
+  port: 5432
+
+persistence:
+  enabled: true
+  size: 5Gi

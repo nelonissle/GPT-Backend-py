@@ -11,7 +11,7 @@ service:
 
 env:
   - name: DATABASE_URL
-    value: "sqlite:///./auth.db"
+    value: "sqlite:///app/data/auth.db"
   - name: ALGORITHM
     value: "HS256"
   - name: KONG_ADMIN_URL
@@ -29,3 +29,11 @@ resources: {}
 
 secrets:
   SECRET_KEY: ""
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+logsPersistence:
+  enabled: true
+  size: 1Gi

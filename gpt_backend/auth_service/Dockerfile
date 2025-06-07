@@ -23,5 +23,8 @@ EXPOSE 8002
 # Define environment variable for Python to not buffer output (helpful for logs)
 ENV PYTHONUNBUFFERED=1
 
+VOLUME ["/app/data"]
+VOLUME ["/app/logs"]
+
 # Command to run the application using uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8002"]
