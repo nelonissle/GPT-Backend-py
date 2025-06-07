@@ -222,9 +222,25 @@ jobs:
           mention: here
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  
+  lint-helm:
+    needs: [test-admin, test-auth, test-chat]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+      - name: Lint all Helm charts
+        run: |
+          helm lint kub-gpt/charts/admin-service
+          helm lint kub-gpt/charts/auth-service
+          helm lint kub-gpt/charts/chat-service
+          helm lint kub-gpt/charts/kong
+          helm lint kub-gpt/charts/mongo
+          helm lint kub-llm/charts/ollama
 
   deploy-staging:
-    needs: [test-admin, test-auth, test-chat]
+    needs: lint-helm
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -287,3 +303,4 @@ jobs:
           tags: nelonissle7/gpt_chat:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
