@@ -10,7 +10,12 @@ image:
   pullPolicy: IfNotPresent
 
 # which model to load
-model: llama3
+ollama:
+  models:
+    pull:  # Pull from Ollama's model library
+      - tinyllama  # Example mini model
+    run:   # Load into memory on startup
+      - tinyllama
 
 # service settings (also drives containerPort & ingress backend port)
 service:
