@@ -1,0 +1,19 @@
+replicaCount: 1
+
+image:
+  repository: nelonissle7/gpt_chat
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8003
+
+env: []
+  # - name: EXAMPLE_ENV
+  #   value: "value"
+
+resources: {}
+ingress:
+  enabled: true
+  host: chat.local

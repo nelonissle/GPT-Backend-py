@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kong-migrations
+spec:
+  template:
+    spec:
+      containers:
+        - name: kong-migrations
+          image: {{ .Values.migrations.image }}
+          command: ["kong", "migrations", "bootstrap"]
+          env:
+            - name: KONG_DATABASE
+              value: "postgres"
+            - name: KONG_PG_HOST
+              value: kong-database
+            - name: KONG_PG_USER
+              value: {{ .Values.postgres.user | quote }}
+            - name: KONG_PG_PASSWORD
+              value: {{ .Values.postgres.password | quote }}
+            - name: KONG_PG_DATABASE
+              value: {{ .Values.postgres.db | quote }}
+      restartPolicy: OnFailure

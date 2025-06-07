@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong-gateway
+  template:
+    metadata:
+      labels:
+        app: kong-gateway
+    spec:
+      containers:
+        - name: kong
+          image: {{ .Values.kong.image }}
+          env:
+            - name: KONG_DATABASE
+              value: "postgres"
+            - name: KONG_PG_HOST
+              value: kong-database
+            - name: KONG_PG_USER
+              value: {{ .Values.postgres.user | quote }}
+            - name: KONG_PG_PASSWORD
+              value: {{ .Values.postgres.password | quote }}
+            - name: KONG_PG_DATABASE
+              value: {{ .Values.postgres.db | quote }}
+          ports:
+            - containerPort: {{ .Values.kong.proxyPort }}
+            - containerPort: {{ .Values.kong.adminPort }}
+            - containerPort: {{ .Values.kong.proxySSLPort }}
+            - containerPort: {{ .Values.kong.adminSSLPort }}

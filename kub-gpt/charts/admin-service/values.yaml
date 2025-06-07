@@ -1,0 +1,10 @@
+image:
+  repository: nelonissle7/gpt_admin
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8004
+
+env: []

@@ -1,0 +1,16 @@
+replicaCount: 1
+
+image:
+  repository: nelonissle7/gpt_auth
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8002
+
+env: []
+  # - name: EXAMPLE_ENV
+  #   value: "value"
+
+resources: {}

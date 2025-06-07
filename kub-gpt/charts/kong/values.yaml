@@ -1,0 +1,22 @@
+postgres:
+  image: postgres:14
+  user: kong
+  password: kong
+  db: kong
+
+kong:
+  image: kong:latest
+  adminPort: 8001
+  proxyPort: 8000
+  adminSSLPort: 8444
+  proxySSLPort: 8443
+
+migrations:
+  image: kong:latest
+
+service:
+  type: ClusterIP
+
+ingress:
+  enabled: true
+  host: kong.local
