@@ -13,5 +13,9 @@ postgresUser: "kong"
 postgresDB: "kong"
 # KONG_PG_PASSWORD should be set via secret
 
+service:
+  type: ClusterIP
+  port: 8000
+
 secrets:
   KONG_PG_PASSWORD: ""
