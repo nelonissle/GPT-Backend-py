@@ -9,7 +9,7 @@ curl http://localhost:11434
 
 echo
 echo "ollama install model:"
-curl -X POST http://localhost:11434/api/pull -d \
+curl -X POST http://localhost:11434/api/pull \
      -H "Content-Type: application/json" \
      -d '{"name":"llama3"}'
      

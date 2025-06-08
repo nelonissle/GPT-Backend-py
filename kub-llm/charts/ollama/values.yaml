@@ -12,9 +12,10 @@ resources:
     # Uncomment if using GPU nodes:
     gpu: 1
 
-persistentVolume:
+persistence:
   enabled: true
   size: 10Gi
+  storageClass: microk8s-hostpath
 
 service:
   type: ClusterIP

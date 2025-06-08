@@ -7,4 +7,6 @@ microk8s kubectl get all -n ingress
 echo
 echo "kubectl get volumes:"
 microk8s kubectl get pv
+ls /var/snap/microk8s/common/default-storage
+ls /data/logs
 

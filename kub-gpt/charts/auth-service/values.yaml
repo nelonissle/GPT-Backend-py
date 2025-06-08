@@ -16,6 +16,11 @@ env:
     value: "HS256"
   - name: KONG_ADMIN_URL
     value: "http://kong-gateway:8001/consumers"
+  - name: SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        name: auth-service-secrets
+        key: SECRET_KEY
 
 resources: {}
 
@@ -24,7 +29,8 @@ secrets:
 
 persistence:
   enabled: true
-  size: 10Gi
+  size: 1Gi
+  storageClass: microk8s-hostpath
 
 logsPersistence:
   enabled: true

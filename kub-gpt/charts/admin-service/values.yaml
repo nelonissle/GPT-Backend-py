@@ -12,10 +12,22 @@ env:
     value: "http://kong-gateway:8000/auth"
   - name: KONG_ADMIN_URL
     value: "http://kong-gateway:8001/consumers"
+  - name: MONGO_INITDB_ROOT_USERNAME
+    value: "mongoadmin"
   - name: MONGO_SERVICE_HOST
     value: "mongo_db"
   - name: MONGO_SERVICE_PORT
     value: "27017"
+  - name: SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        name: admin-service-secrets
+        key: SECRET_KEY
+  - name: MONGO_INITDB_ROOT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: admin-service-secrets
+        key: MONGO_INITDB_ROOT_PASSWORD
 
 secrets:
   SECRET_KEY: ""

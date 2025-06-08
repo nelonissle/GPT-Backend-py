@@ -3,15 +3,25 @@ image:
   tag: "14"
   pullPolicy: IfNotPresent
 
-postgres:
-  user: kong
-  password: kongpassword
-  db: kong
-
 service:
   type: ClusterIP
   port: 5432
 
+env:
+  - name: POSTGRES_DB
+    value: kong
+  - name: POSTGRES_USER
+    value: kong
+  - name: POSTGRES_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secrets
+        key: POSTGRES_PASSWORD
+
+secrets:
+  POSTGRES_PASSWORD: ""
+
 persistence:
   enabled: true
-  size: 10Gi
+  size: 2Gi
+  storageClass: microk8s-hostpath

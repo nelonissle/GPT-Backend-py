@@ -26,6 +26,16 @@ env:
     value: "mongo_db"
   - name: MONGO_SERVICE_PORT
     value: "27017"
+  - name: SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        name: chat-service-secrets
+        key: SECRET_KEY
+  - name: MONGO_INITDB_ROOT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: chat-service-secrets
+        key: MONGO_INITDB_ROOT_PASSWORD
 
 resources: {}
 ingress:
@@ -35,8 +45,6 @@ ingress:
 secrets:
   SECRET_KEY: ""
   MONGO_INITDB_ROOT_PASSWORD: ""
-  KONG_PG_PASSWORD: ""
-  POSTGRES_PASSWORD: ""
 
 logsPersistence:
   enabled: true

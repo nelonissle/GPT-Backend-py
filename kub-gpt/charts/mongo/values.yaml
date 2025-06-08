@@ -25,4 +25,5 @@ secrets:
 
 persistence:
   enabled: true
-  size: 10Gi
+  size: 2Gi
+  storageClass: microk8s-hostpath

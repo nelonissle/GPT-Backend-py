@@ -21,13 +21,13 @@ spec:
           env:
             {{- range .Values.env }}
             - name: {{ .name }}
+              {{- if .value }}
               value: {{ .value | quote }}
-            {{- end }}
-            - name: SECRET_KEY
+              {{- else if .valueFrom }}
               valueFrom:
-                secretKeyRef:
-                  name: admin-service-secrets
-                  key: SECRET_KEY
+                {{- toYaml .valueFrom | nindent 18 }}
+              {{- end }}
+            {{- end }}
           volumeMounts:
             - name: sqlite-db
               mountPath: /app/data
