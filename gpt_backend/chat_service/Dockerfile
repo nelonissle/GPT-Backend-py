@@ -12,7 +12,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Anwendungscode kopieren
-COPY ./app /app
+COPY . /app
 
 # Port freigeben
 EXPOSE 8003

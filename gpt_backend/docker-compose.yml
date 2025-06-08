@@ -187,11 +187,11 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+      - ./ollama-entrypoint.sh:/ollama-entrypoint.sh:ro
     networks:
       - gpt_backend_network
     restart: always
-    environment:
-      - OLLAMA_MODELS=llama3
+    entrypoint: ["/bin/sh", "/ollama-entrypoint.sh"]
 
 volumes:
   mongo_data:

@@ -32,3 +32,4 @@ def startup():
             print("ℹ️ Users already seeded.")
     finally:
         db.close()
+
