@@ -2,3 +2,17 @@ apiVersion: v2
 name: gpt-umbrella
 description: Umbrella Chart for GPT Microservices
 version: 0.1.0
+
+dependencies:
+  - name: auth-service
+    version: 0.1.0
+  - name: chat-service
+    version: 0.1.0
+  - name: kong
+    version: 0.1.0
+  - name: mongo
+    version: 0.1.0
+  - name: postgres
+    version: 0.1.0
+  - name: admin-service
+    version: 0.1.0

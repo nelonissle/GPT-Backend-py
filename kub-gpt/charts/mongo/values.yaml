@@ -20,6 +20,9 @@ env:
 
 resources: {}
 
+secrets:
+  MONGO_INITDB_ROOT_PASSWORD: ""
+
 persistence:
   enabled: true
   size: 10Gi
