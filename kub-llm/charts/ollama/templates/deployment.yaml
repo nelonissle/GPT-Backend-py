@@ -1,53 +1,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ollama.fullname" . }}
-  labels:
-    {{- include "ollama.labels" . | nindent 4 }}
+  name: {{ include "ollama-tinyllama.fullname" . }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "ollama.name" . }}
+      app: {{ include "ollama-tinyllama.name" . }}
   template:
     metadata:
       labels:
-        app: {{ include "ollama.name" . }}
-        {{- include "ollama.labels" . | nindent 8 }}
+        app: {{ include "ollama-tinyllama.name" . }}
     spec:
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{ toYaml . | nindent 8 }}
-      {{- end }}
-      {{- if .Values.tolerations }}
-      tolerations:
-        {{ toYaml .Values.tolerations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.affinity }}
-      affinity:
-        {{ toYaml .Values.affinity | nindent 8 }}
-      {{- end }}
       containers:
         - name: ollama
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-          env:
-            - name: OLLAMA_MODELS
-              value: "{{ .Values.model }}"
+            - containerPort: 11434
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
           resources:
             limits:
-              nvidia.com/gpu: 1   # Request 1 GPU
-          {{- if .Values.persistence.enabled }}
-          volumeMounts:
-            - name: {{ include "ollama.fullname" . }}-data
-              mountPath: /root/.ollama
-          {{- end }}
-      {{- if .Values.persistence.enabled }}
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+              {{- if .Values.resources.limits.gpu }}
+              nvidia.com/gpu: {{ .Values.resources.limits.gpu }}
+              {{- end }}
       volumes:
-        - name: {{ include "ollama.fullname" . }}-data
+        - name: ollama-data
           persistentVolumeClaim:
-            claimName: {{ include "ollama.fullname" . }}-data
-      {{- end }}
+            claimName: ollama-pvc

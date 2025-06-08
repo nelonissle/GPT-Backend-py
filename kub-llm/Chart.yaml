@@ -5,6 +5,6 @@ type: application
 version: 0.1.0
 appVersion: "latest"
 dependencies:
-  - name: ollama
-    version: "0.1.0"
+  - name: ollama-tinyllama
+    version: "0.1.2"
     repository: "file://charts/ollama"

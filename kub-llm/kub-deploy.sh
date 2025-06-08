@@ -5,6 +5,10 @@ microk8s kubectl get all -n ingress
 microk8s kubectl get pv
 
 echo
+echo "get all helm charts"
+microk8s helm3 list
+
+echo
 echo "all namespaces:"
 microk8s kubectl get namespaces
 
