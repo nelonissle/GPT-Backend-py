@@ -1,4 +1,4 @@
 apiVersion: v2
-name: gpt
+name: gpt-umbrella
 description: Umbrella Chart for GPT Microservices
 version: 0.1.0

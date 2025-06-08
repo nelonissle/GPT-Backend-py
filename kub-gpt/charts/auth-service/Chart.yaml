@@ -4,3 +4,8 @@ description: Auth microservice
 type: application
 version: 0.1.0
 appVersion: "latest"
+
+# mongo must run
+dependencies:
+  - name: kong
+    version: 0.1.0

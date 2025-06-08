@@ -16,14 +16,6 @@ env:
     value: "HS256"
   - name: KONG_ADMIN_URL
     value: "http://kong-gateway:8001/consumers"
-  - name: OLLAMA_MODEL
-    value: "llama3"
-  # - name: OLLAMA_API_URL
-  #   value: "http://ollama:11434"
-  - name: MONGO_SERVICE_HOST
-    value: "mongo_db"
-  - name: MONGO_SERVICE_PORT
-    value: "27017"
 
 resources: {}
 
@@ -32,8 +24,8 @@ secrets:
 
 persistence:
   enabled: true
-  size: 1Gi
+  size: 10Gi
 
 logsPersistence:
   enabled: true
-  size: 1Gi
+  size: 10Gi

@@ -31,4 +31,4 @@ spec:
       volumes:
         - name: pgdata
           persistentVolumeClaim:
-            claimName: {{ include "postgres.fullname" . }}-pvc
+            claimName: postgres-pvc

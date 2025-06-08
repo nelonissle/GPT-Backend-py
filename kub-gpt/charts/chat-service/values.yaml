@@ -18,8 +18,8 @@ env:
     value: "http://kong-gateway:8001/consumers"
   - name: OLLAMA_MODEL
     value: "llama3"
-  # - name: OLLAMA_API_URL
-  #   value: "http://ollama:11434"
+  - name: OLLAMA_API_URL
+    value: "http://ollama:11434"
   - name: MONGO_INITDB_ROOT_USERNAME
     value: "mongoadmin"
   - name: MONGO_SERVICE_HOST
@@ -40,4 +40,4 @@ secrets:
 
 logsPersistence:
   enabled: true
-  size: 1Gi
+  size: 10Gi

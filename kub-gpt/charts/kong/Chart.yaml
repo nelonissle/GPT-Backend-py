@@ -4,3 +4,8 @@ description: Kong Gateway with Postgres and Ingress
 type: application
 version: 0.1.0
 appVersion: "latest"
+
+# mongo must run
+dependencies:
+  - name: postgres
+    version: 0.1.0

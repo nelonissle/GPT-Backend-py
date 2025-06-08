@@ -61,3 +61,7 @@ Für WSL Ubuntu:
 
 Nur Windows:
 Clone repository
+
+## Environment variables
+
+###
