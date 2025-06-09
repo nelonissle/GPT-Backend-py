@@ -62,7 +62,9 @@ Für WSL Ubuntu:
 Nur Windows:
 Clone repository
 
-## Environment variables
+# Environment variables
+
+## gpt umbrella
 
 ### Postgres Container
 POSTGRES_DB = kong
@@ -88,12 +90,33 @@ KONG_PROXY_LISTEN: Address and port for the Proxy.
 KONG_LOG_LEVEL: Log level (notice, info, warn, etc.).
 KONG_DECLARATIVE_CONFIG: Path to a declarative config file (for DB-less mode).
 
-
 ### Mongo
 MONGO_INITDB_ROOT_USERNAME = root
 MONGO_INITDB_ROOT_PASSWORD = pwd2
 
+### Auth-service
+KONG_ADMIN_URL http://kong-gateway:8001/consumers
+DATABASE_URL=sqlite:///app/data/auth.db
+SECRET_KEY
+ALGORITHM
 
 ### Admin-service
 MONGO_GPT_SERVICE_HOST = ip
 MONGO_GPT_SERVICE_PORT = 27017
+MONGO_INITDB_ROOT_USERNAME
+MONGO_INITDB_ROOT_PASSWORD
+SECRET_KEY
+AUTH_SERVICE_URL=http://kong-gateway:8000/auth
+
+### Chat-service
+OLLAMA_MODEL=llama3
+OLLAMA_API_URL=http://ollama:11434
+SECRET_KEY
+MONGO_GPT_SERVICE_HOST
+MONGO_GPT_SERVICE_PORT
+MONGO_INITDB_ROOT_USERNAME
+MONGO_INITDB_ROOT_PASSWORD
+
+## llm umbrella
+
+### Ollama

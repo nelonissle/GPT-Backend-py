@@ -50,6 +50,8 @@ spec:
               value: "$(POSTGRES_GPT_SERVICE_HOST)"
             - name: KONG_PG_USER
               value: {{ .Values.postgresUser | quote }}
+            - name: KONG_ADMIN_LISTEN
+              value: "0.0.0.0:8001"
             - name: KONG_PG_PASSWORD
               valueFrom:
                 secretKeyRef:

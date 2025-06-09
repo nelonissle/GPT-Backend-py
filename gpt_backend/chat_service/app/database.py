@@ -12,8 +12,8 @@ def get_db():
     Lazily construct and return a MongoDB database instance.
     Raises ValueError if any required MONGO_* env-vars are missing.
     """
-    host = os.getenv("MONGO_SERVICE_HOST")
-    port = os.getenv("MONGO_SERVICE_PORT")
+    host = os.getenv("MONGO_GPT_SERVICE_HOST")
+    port = os.getenv("MONGO_GPT_SERVICE_PORT")
     user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
     pwd  = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
     db_name = os.getenv("MONGO_DB_NAME", "chat_database")

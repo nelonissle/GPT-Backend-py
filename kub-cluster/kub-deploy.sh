@@ -7,6 +7,7 @@
 echo
 echo "enable ingress:"
 microk8s enable ingress
+microk8s kubectl apply -f ingress-extern.yaml
 
 echo
 echo "Create pv and optional microk8s-hostpath storageClass:"
