@@ -64,4 +64,36 @@ Clone repository
 
 ## Environment variables
 
-###
+### Postgres Container
+POSTGRES_DB = kong
+POSTGRES_USER = kong
+POSTGRES_PASSWORD = pwd1
+
+### Kong and Kong Migration
+POSTGRES_GPT_SERVICE_HOST ip
+POSTGRES_GPT_SERVICE_PORT 5432
+KONG_DATABASE = postgres
+KONG_PG_DATABASE = kong
+KONG_PG_HOST = POSTGRES_GPT_SERVICE_HOST
+KONG_PG_PORT = POSTGRES_GPT_SERVICE_PORT
+KONG_PG_USER = kong
+KONG_PG_PASSWORD = pwd1
+
+KONG_PROXY_ACCESS_LOG: Path for the proxy access log.
+KONG_ADMIN_ACCESS_LOG: Path for the admin access log.
+KONG_PROXY_ERROR_LOG: Path for the proxy error log.
+KONG_ADMIN_ERROR_LOG: Path for the admin error log.
+KONG_ADMIN_LISTEN: Address and port for the Admin API.
+KONG_PROXY_LISTEN: Address and port for the Proxy.
+KONG_LOG_LEVEL: Log level (notice, info, warn, etc.).
+KONG_DECLARATIVE_CONFIG: Path to a declarative config file (for DB-less mode).
+
+
+### Mongo
+MONGO_INITDB_ROOT_USERNAME = root
+MONGO_INITDB_ROOT_PASSWORD = pwd2
+
+
+### Admin-service
+MONGO_GPT_SERVICE_HOST = ip
+MONGO_GPT_SERVICE_PORT = 27017

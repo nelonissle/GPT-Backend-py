@@ -12,7 +12,7 @@ services:
     restart: always
 
   kong-migrations:
-    image: kong:latest
+    image: kong:3.9.0
     container_name: kong-migrations
     command: kong migrations bootstrap
     env_file:
@@ -24,7 +24,7 @@ services:
     restart: "no"
 
   kong-gateway:
-    image: kong:latest
+    image: kong:3.9.0
     container_name: kong-gateway
     user: root
     env_file:

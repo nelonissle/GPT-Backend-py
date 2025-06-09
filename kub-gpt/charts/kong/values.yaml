@@ -1,12 +1,12 @@
 kong:
-  image: kong:latest
+  image: kong:3.9.0
   proxyPort: 8000
   adminPort: 8001
   proxySSLPort: 8443
   adminSSLPort: 8444
 
 migrations:
-  image: kong:latest
+  image: kong:3.9.0
 
 postgresHost: "postgres"      # The name of your Postgres service
 postgresUser: "kong"
