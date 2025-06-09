@@ -69,6 +69,7 @@ Clone repository
 ```bash
 cd kub-cluster
 ./kub-deploy.sh
+./kub-ports.sh
 cd ..
 
 cd kub-llm

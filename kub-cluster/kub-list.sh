@@ -3,6 +3,8 @@
 echo "kubectl get all -n ingress:"
 microk8s kubectl get all -n ingress
 
+sudo iptables -t nat -L -n -v --line-numbers
+
 # Get the status of the deployment
 echo
 echo "kubectl get volumes:"
