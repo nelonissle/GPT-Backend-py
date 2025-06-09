@@ -7,12 +7,23 @@ echo "Do you want to forward ports with kubectl? (y/n)"
 read answer
 if [[ "$answer" == "y" ]]; then
   echo "kubectl forward port to localhost:"
-  microk8s kubectl port-forward svc/llm-ollama-tinyllama 11434:11434 -n llm
-  microk8s kubectl port-forward svc/kong-gateway 8000:8000 8001:8001 -n gpt
+  echo "Starting kubectl port-forward in screen sessions..."
+  
+  # Kong port forwarding
+  screen -dmS kong-forward microk8s kubectl port-forward svc/kong-gateway 8000:8000 8001:8001 -n gpt
+  echo "Kong port-forward started in screen session 'kong-forward'"
+  
+  # Ollama port forwarding
+  screen -dmS ollama-forward microk8s kubectl port-forward svc/llm-ollama-tinyllama 11434:11434 -n llm
+  echo "Ollama port-forward started in screen session 'ollama-forward'"
+  
+  echo "To view running sessions: screen -ls"
+  echo "To attach to kong session: screen -r kong-forward"
+  echo "To attach to ollama session: screen -r ollama-forward"
 fi
 
 echo
-echo "Do you want to forward ports? (y/n)"
+echo "Do you want to use ingress and iptables? (y/n)"
 read answer
 if [[ "$answer" == "y" ]]; then
   echo "forward ports to localhost using ingress:"
