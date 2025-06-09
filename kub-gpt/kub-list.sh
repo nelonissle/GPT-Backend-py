@@ -20,6 +20,7 @@ microk8s kubectl get deployments -n gpt
 echo
 echo "kubectl get services:"
 microk8s kubectl get services -n gpt
+microk8s kubectl get ingress -n gpt
 
 echo
 echo "kubectl get replicasets:"
