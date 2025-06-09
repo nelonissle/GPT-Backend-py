@@ -1,33 +1,19 @@
-{{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "kong.fullname" . }}
-  {{- with .Values.ingress.annotations }}
+  name: kong-gateway
+  namespace: gpt
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 spec:
-  {{- if .Values.ingress.className }}
-  ingressClassName: {{ .Values.ingress.className }}
-  {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+    - host: kong.local
       http:
         paths:
-          {{- range .paths }}
-          - path: {{ .path }}
-            pathType: {{ .pathType }}
+          - path: /
+            pathType: Prefix
             backend:
               service:
-                name: {{ include "kong.fullname" $ }}
+                name: kong-gateway
                 port:
-                  number: {{ $.Values.service.port }}
-          {{- end }}
-    {{- end }}
-  {{- if .Values.ingress.tls }}
-  tls:
-    {{- toYaml .Values.ingress.tls | nindent 4 }}
-  {{- end }}
-{{- end }}
+                  number: {{ .Values.service.port }}

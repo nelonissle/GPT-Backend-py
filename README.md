@@ -81,6 +81,8 @@ cd kub-gpt
 ./kub-deploy.sh
 # open a shell in admin pod with script kub-shell.sh
 ./kub-shell.sh
+cd app
+chmod 755 setup_kong.sh
 ./setup_kong.sh
 exit
 ```
@@ -144,3 +146,20 @@ MONGO_INITDB_ROOT_PASSWORD
 ## llm umbrella
 
 ### Ollama
+
+# Ingress
+
+How to Fix: Make Ingress Controller Listen on All Interfaces
+1. Edit the Ingress Controller Deployment
+Edit the deployment to remove any --bind-address=127.0.0.1 or similar argument, or explicitly set it to 0.0.0.0:
+
+Look for the args: section under spec.template.spec.containers.
+If you see --bind-address=127.0.0.1, change it to --bind-address=0.0.0.0 or remove it.
+2. Restart the Ingress Controller
+After editing, the pod will restart automatically.
+
+3. Confirm Listening Ports
+On your node, run:
+
+You should see 0.0.0.0:30800 or your node’s external IP.
+
