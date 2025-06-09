@@ -62,6 +62,29 @@ Für WSL Ubuntu:
 Nur Windows:
 Clone repository
 
+# Initial setup kubernetes
+
+## start kubernetes
+
+```bash
+cd kub-cluster
+./kub-deploy.sh
+cd ..
+
+cd kub-llm
+./kub-deploy.sh
+./kub-curl.sh
+cd ..
+
+cd kub-gpt
+./kub-deploy.sh
+# open a shell in admin pod with script kub-shell.sh
+./kub-shell.sh
+./setup_kong.sh
+exit
+```
+
+
 # Environment variables
 
 ## gpt umbrella
