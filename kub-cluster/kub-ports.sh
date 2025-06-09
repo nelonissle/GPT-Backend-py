@@ -20,6 +20,7 @@ if [[ "$answer" == "y" ]]; then
   echo "To view running sessions: screen -ls"
   echo "To attach to kong session: screen -r kong-forward"
   echo "To attach to ollama session: screen -r ollama-forward"
+  screen -ls
 fi
 
 echo
