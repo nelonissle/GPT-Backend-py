@@ -18,5 +18,5 @@ persistence:
   storageClass: microk8s-hostpath
 
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 11434

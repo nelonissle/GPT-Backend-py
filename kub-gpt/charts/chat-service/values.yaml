@@ -38,9 +38,6 @@ env:
         key: MONGO_INITDB_ROOT_PASSWORD
 
 resources: {}
-ingress:
-  enabled: true
-  host: chat.local
 
 secrets:
   SECRET_KEY: ""

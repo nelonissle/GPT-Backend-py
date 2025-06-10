@@ -14,19 +14,8 @@ postgresDB: "kong"
 # KONG_PG_PASSWORD should be set via secret
 
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 8000
 
 secrets:
   KONG_PG_PASSWORD: ""
-
-ingress:
-  enabled: true
-  className: ""
-  annotations: {}
-  hosts:
-    - host: kong.local
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
