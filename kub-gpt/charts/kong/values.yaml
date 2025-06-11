@@ -16,6 +16,7 @@ postgresDB: "kong"
 service:
   type: LoadBalancer
   port: 8000
+  ip: 
 
 secrets:
   KONG_PG_PASSWORD: ""

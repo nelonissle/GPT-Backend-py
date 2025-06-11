@@ -20,3 +20,4 @@ persistence:
 service:
   type: LoadBalancer
   port: 11434
+  ip: 192.168.9.180
