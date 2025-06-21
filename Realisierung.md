@@ -2,18 +2,19 @@
 
 Für die Realisierung habe ich eine Arbeitsumgebung aufgebaut, diese besteht aus dem Sourcecode (in github) und der Entwicklungsumgebung. Ich entwickle unter Windows 11 oder Windows 11 Subsystem for Linux (WSL). Unter Windows 11 nutze ich ein paar Powershell Scripts (.ps1) um arbeiten zu erleichtern, unter WSL, in den Containers nutze ich Unix Shell Scripts (.sh).
 
-## Struktur Sourcecode
+## Struktur
 
-Dieses Repository enthält eine containerisierte KI Chat Anwendung mit Kubernetes-Deployment-Konfigurationen. Die Struktur ist in zwei Hauptbereiche unterteilt:
+Mein Repository enthält eine containerisierte KI Chat Anwendung mit Kubernetes-Deployment-Konfigurationen. Die Struktur ist in diese Bereiche unterteilt:
 
 1. **Anwendungscode** (`gpt_backend/`) - Python-basierte Microservices
 2. **Kubernetes-Konfigurationen** (`kub-*/`) - Helm Charts und Deployment-Skripte
+3. **Architkeutr**
+4. **Entwicklungsumgebung** - Lokal und Docker Compose
+5. **Technologie-STack** - Was sind die Abhängigkeiten
 
 ---
 
 ## 1. Anwendungscode (`gpt_backend/`)
-
-### Architektur
 Das Backend folgt einer **Microservices-Architektur** mit den folgenden Services:
 
 ### 1.1 Admin Service (`gpt_backend/admin_service/`)
@@ -156,53 +157,104 @@ kub-llm/
 
 ---
 
-## 3. Netzwerk-Architektur
+## 3. Architektur
 
 ### 3.1 Service-Kommunikation
 
 ```
+Internet/Client
+       ↓
 ┌─────────────────┐
-│  Internet       │
-│  Browser App    │
-│  (Frontend)     │
+│   Kong Gateway  │ (API Gateway)
+│   Port: 8000    │
 └─────────┬───────┘
-          │ HTTP/HTTPS
-          │ Port 8000
-          ▼
+          │
+    ┌─────┴─────┐
+    ▼           ▼
+┌─────────┐ ┌─────────┐
+│  Auth   │ │  Chat   │
+│ Service │ │ Service │
+│  :8002  │ │  :8003  │
+└─────────┘ └────┬────┘
+                 │
+            ┌────┴────┐
+            ▼         ▼
+      ┌─────────┐ ┌─────────┐
+      │ MongoDB │ │ Ollama  │
+      │ :27017  │ │ :11434  │
+      └─────────┘ └─────────┘
+```
+
+
+### 3.2 Service Aufbau
+
+#### 3.2.1 Core Application Stack
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Kong Gateway  │    │  Auth Service   │    │  Chat Service   │
+│   Port: 8000    │◄──►│  Port: 8002     │    │  Port: 8003     │
+│   Port: 8001    │    │                 │    │                 │
+└─────────┬───────┘    └─────────────────┘    └─────────┬───────┘
+          │                                              │
+          ▼                                              │
+┌─────────────────┐                                      │
+│ Kong Database   │                                      │
+│ (PostgreSQL)    │                                      │
+│ Port: 5432      │                                      │
+└─────────────────┘                                      │
+                                                         ▼
+┌─────────────────┐                            ┌─────────────────┐
+│ Kong Migrations │                            │    MongoDB      │
+│ (Init Only)     │                            │ Port: 27017     │
+└─────────────────┘                            └─────────────────┘
+```
+
+#### 3.2.2 AI/LLM Stack
+
+```
 ┌─────────────────┐
-│  Kong Gateway   │
-│  API Proxy      │
-│  Port 8000      │
-└─────────┬───────┘
-          │ Internal
-          │ Service Call
-          │ Port 8003
-          ▼
-┌─────────────────┐     ┌─────────────────┐
-│  Chat Service   │────▶│    MongoDB      │
-│  FastAPI        │     │  Datenbank      │
-│  Port 8003      │     │  Port 27017     │
-└─────────┬───────┘     └─────────────────┘
-          │ HTTP API Call
-          │ Port 11434
-          ▼
-┌─────────────────┐
-│  Ollama LLM     │
-│  AI Service     │
-│  Port 11434     │
+│     Ollama      │◄── Chat Service
+│  Port: 11434    │
+│   (LLM API)     │
 └─────────────────┘
 ```
 
-### 3.2 Kubernetes-Kommunikation
+#### 3.2.3 Admin & Management
+
+```
+┌─────────────────┐
+│ Admin Service   │
+│  Port: 8004     │◄── Depends on Auth & Chat
+└─────────────────┘
+```
+
+#### 3.2.4 Monitoring Stack
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│    Grafana      │◄──►│   Prometheus    │    │      Loki       │
+│  Port: 3000     │    │  Port: 9090     │◄──►│  Port: 3100     │
+│  (Dashboard)    │    │   (Metrics)     │    │    (Logs)       │
+└─────────────────┘    └─────────────────┘    └─────────┬───────┘
+                                                        ▲
+                                              ┌─────────────────┐
+                                              │    Promtail     │
+                                              │  Port: 9080     │
+                                              │ (Log Collector) │
+                                              └─────────────────┘
+```
+
+### 3.3 Kubernetes-Kommunikation
 In Kubernetes ist die Netzwerkkommunikation sehr komplex. Es braucht zusätzlich einen Ingress Controller und ein Loadbalacer um die internen
 IP Adressen und Ports von ausserhalb des Kubernetes anzusprechen. Ich habe auch Kubernetes in die drei Teile Ollama, meine GPT services und Monitoring aufgeteilt. So könnte ich es auf verschiedene Rechner verteilen.
 
-#### 3.2.1 Port-Mapping
+#### 3.3.1 Port-Mapping
 - **8000** → Kong Proxy (via LoadBalancer/NodePort 30800)
 - **8001** → Kong Admin (via LoadBalancer/NodePort 30801)
 - **11434** → Ollama API (via LoadBalancer/NodePort 31434)
 
-#### 3.2.2 Ingress-Routing
+#### 3.3.2 Ingress-Routing
 - **kong.local** → Kong Gateway Service
 - **chat.local** → Chat Service
 - **ollama.local** → Ollama Service
@@ -213,6 +265,8 @@ IP Adressen und Ports von ausserhalb des Kubernetes anzusprechen. Ich habe auch 
 In meinem Projekt setze ich Mongo DB, Kong und Ollama ein. Es ist am einfachsten diese 3 Dienste mit einem Docker Container zu betreiben und nicht lokal zu installieren. Auch bei der lokalen Entwicklung, werden diese Dienste im Docker Container genutzt.
 
 Ich entwickle mit Microsoft Visual Code und nutze Ertweiterungen für Python, Mongo, Git etc. Dies ermöglicht mir möglichst alles aus Visual Code zu machen.
+
+Ich nutze PyTest für die unit tests.
 
 ### 4.1 Lokal
 Folgende Software muss installiert sein:
@@ -239,9 +293,8 @@ Um mit Docker Compose zu arbeiten, muss jeder Service ein Dockerfile besitzen, d
 
 Der grosse Vorteil ist, dass es hier bereits wie in der Produktion ist und somit dann die Umsetzung auf Kubernetes viel leichter wird. Ich kann damit auch rasch auf einen neuen Rechner gehen, ohne dass ich viel Konfigurieren muss.
 
-
-
-
+### 4.3 Kubernetes
+Hier ging es nicht mehr um Entwicklung sondern mehr um die Umgebung lauffähig zu machen. Ich habe ein Setup hingebracht mit microk8s als Kuberneteslösung. Dazu habe ich eine Ubuntu Server Installation genutzt. Die grösste Herausforderung ist die Komplexität wie Netzwerk, Filesysteme, Secrets, Startsequenz. 
 
 ## 5. Technologie-Stack
 
@@ -268,21 +321,3 @@ Der grosse Vorteil ist, dass es hier bereits wie in der Produktion ist und somit
 
 ---
 
-## 6. Besonderheiten
-
-### 6.1 Secrets Management
-- Helm-basierte Secret-Injection
-- Umgebungsvariablen für Passwörter
-- Kubernetes Secret Resources
-
-### 6.2 Storage
-- **Persistent Volumes** für Datenbanken und Logs
-- **Volume Mounts** für Log-Sammlung
-- **Model Storage** für LLM-Modelle
-
-### 6.3 Entwicklung vs. Produktion
-- **Development:** Port-Forwarding, lokale Services
-- **Production:** LoadBalancer, Ingress-basiertes Routing
-- **Monitoring:** Prometheus-Integration (Kong Plugin)
-
-Diese Architektur ermöglicht eine skalierbare, containerisierte GPT-Backend-Lösung mit vollständiger Kubernetes-Integration und flexiblen Deployment-Optionen.
