@@ -66,19 +66,19 @@ chat_service/
 - **Framework:** FastAPI
 - **Integration:** Ollama/LLM Services
 
-### 1.5 Kong Service (`gpt_backend/chat_service/`)
+### 1.4 Kong Service (`gpt_backend/chat_service/`)
 Dies sind nur Dateien für die Konfiguration von Kong.
 
-### 1.6 Monitoring Services (`gpt_backend/monitoring/`)
+### 1.5 Monitoring Services (`gpt_backend/monitoring/`)
 Dies sind Arbeitsdokumente welche ich für die Realisierung verwendete.
 
-### 1.7 Ollama (`gpt_backend/ollama/`)
+### 1.6 Ollama (`gpt_backend/ollama/`)
 Hilfestellungen für die automatisierte Erstellung von einem einfachen LLM innerhalb von ollama. Dies wird nur im lokalen und Docker Umfeld verwendet. Im Kubernetes erstelle ich alles über API calls nach dem erfolgreichen Start.
 
-### 1.8 Dokumentation (`gpt_backend/Markdowns/`)
+### 1.7 Dokumentation (`gpt_backend/Markdowns/`)
 Dies sind Arbeitsdokumente welche ich für die Realisierung verwendete.
 
-### 1.9 Entwicklungstools
+### 1.8 Entwicklungstools
 - **`dev-local-init.sh`** - Lokale Entwicklungsumgebung Setup um lokale die Python Services zu starten
 - **`dev-docker-init.sh`** - Lokale Entwicklungsumgebung Setup um den docker-compose zu starten
 - **`docker-compose.yml`** - Lokale Container-Orchestrierung
