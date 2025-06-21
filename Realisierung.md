@@ -296,6 +296,41 @@ Der grosse Vorteil ist, dass es hier bereits wie in der Produktion ist und somit
 ### 4.3 Kubernetes
 Hier ging es nicht mehr um Entwicklung sondern mehr um die Umgebung lauffähig zu machen. Ich habe ein Setup hingebracht mit microk8s als Kuberneteslösung. Dazu habe ich eine Ubuntu Server Installation genutzt. Die grösste Herausforderung ist die Komplexität wie Netzwerk, Filesysteme, Secrets, Startsequenz. 
 
+### 4.4 Testkonzept und Deployment
+Ich nutze CI/CD Techniken von Github (Github Actions) um meine Tests bei jedem commit durchzuführen und Docker images zu erstellen und auf Docker Hub abzulegen. Dies ist mein Testkonzept und die Umsetzung.
+
+Dazu definiere ich einen Github Action Workflow in `.github/workflows/python.yml`. Dort kann ich festlegen was wann ausgeführt wird und zwar auf github.
+
+**Admin Service:**
+- Lint mit flake8 (max 120 Zeichen)
+- Security Scan mit safety
+- Dependency Installation
+- Tests mit pytest (toleriert Fehler)
+
+**Auth Service:**
+- Lint mit flake8
+- Security Scan mit safety  
+- Dependency Installation
+- Tests mit pytest + SQLite in-memory DB
+
+**Chat Service:**
+- Lint mit flake8
+- Security Scan mit safety
+- Dependency Installation
+- Tests mit pytest + MongoDB Service Container
+
+**Helm Linting**
+- Validierung aller Helm Charts:
+  - `admin-service`, `auth-service`, `chat-service`
+  - `kong`, `mongo`, `ollama`
+
+**Deployment**
+- Abhängig von erfolgreichen Tests
+- Docker Hub Push für alle Services:
+  - `nelonissle7/gpt_admin:latest`
+  - `nelonissle7/gpt_auth:latest`
+  - `nelonissle7/gpt_chat:latest`
+
 ## 5. Technologie-Stack
 
 ### Backend Services
