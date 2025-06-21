@@ -10,7 +10,7 @@ Mein Repository enthält eine containerisierte KI Chat Anwendung mit Kubernetes-
 2. **Kubernetes-Konfigurationen** (`kub-*/`) - Helm Charts und Deployment-Skripte
 3. **Architkeutr**
 4. **Entwicklungsumgebung** - Lokal und Docker Compose
-5. **Technologie-STack** - Was sind die Abhängigkeiten
+5. **Technologie-Stack** - Was sind die Abhängigkeiten
 
 ---
 
@@ -196,14 +196,14 @@ Internet/Client
 │   Port: 8000    │◄──►│  Port: 8002     │    │  Port: 8003     │
 │   Port: 8001    │    │                 │    │                 │
 └─────────┬───────┘    └─────────────────┘    └─────────┬───────┘
-          │                                              │
-          ▼                                              │
-┌─────────────────┐                                      │
-│ Kong Database   │                                      │
-│ (PostgreSQL)    │                                      │
-│ Port: 5432      │                                      │
-└─────────────────┘                                      │
-                                                         ▼
+          │                                             │
+          ▼                                             │
+┌─────────────────┐                                     │
+│ Kong Database   │                                     │
+│ (PostgreSQL)    │                                     │
+│ Port: 5432      │                                     │
+└─────────────────┘                                     │
+                                                        ▼
 ┌─────────────────┐                            ┌─────────────────┐
 │ Kong Migrations │                            │    MongoDB      │
 │ (Init Only)     │                            │ Port: 27017     │
