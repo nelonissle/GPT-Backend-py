@@ -3,10 +3,7 @@
 Write-Host "Creating .env file..."
 
 # Copy template-dotenv-secrets.txt to .env
-Copy-Item -Path "template-dotenv-secrets.txt" -Destination ".env" -Force
-
-# Append the contents of template-dotenv.txt to .env
-Get-Content -Path "template-dotenv.txt" | Add-Content -Path ".env"
+Copy-Item -Path "template-dotenv.txt" -Destination ".env" -Force
 
 # Start Docker Compose
 #docker-compose up -d

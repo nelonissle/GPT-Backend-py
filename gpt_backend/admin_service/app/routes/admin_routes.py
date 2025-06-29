@@ -12,6 +12,11 @@ import httpx
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 
+auth_service = os.getenv("AUTH_SERVICE_URL", "/auth")
+kong_host = os.getenv("KONG_GATEWAY_SERVICE_SERVICE_HOST", "localhost")
+kong_port = os.getenv("KONG_GATEWAY_SERVICE_SERVICE_PORT", "8000")
+auth_service_url = f"http://{kong_host}:{kong_port}{auth_service}"
+
 router = APIRouter()
 security = HTTPBearer()
 
@@ -39,7 +44,6 @@ class User(Base):
     dependencies=[Depends(verify_developer_token)]
 )
 async def list_users(request: Request):
-    auth_service_url = os.getenv("AUTH_SERVICE_URL")
     token = request.headers.get("authorization")
 
     try:
@@ -67,7 +71,6 @@ async def list_users(request: Request):
     status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_user(username: str, request: Request, mongo_db=Depends(get_mongo_db)):
-    auth_service_url = os.getenv("AUTH_SERVICE_URL")
     token = request.headers.get("authorization")
 
     # 1) Remove user via auth_service

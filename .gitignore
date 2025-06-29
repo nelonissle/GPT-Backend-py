@@ -164,3 +164,4 @@ cython_debug/
 .env
 *.env
 auth_service.db
+auth.db

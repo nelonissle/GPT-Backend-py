@@ -1,11 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
 import os
-
-# Lade .env Variablen von gpt_backend Verzeichnis
-load_dotenv(dotenv_path="../.env")
 
 # Hole die MongoDB URI aus den Umgebungsvariablen
 DATABASE_URL = os.getenv("DATABASE_URL")

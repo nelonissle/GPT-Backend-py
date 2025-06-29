@@ -31,6 +31,7 @@ microk8s helm3 install gpt . --namespace gpt \
   --set auth-service.secrets.SECRET_KEY="$SECRET_KEY" \
   --set chat-service.secrets.SECRET_KEY="$SECRET_KEY" \
   --set chat-service.secrets.MONGO_INITDB_ROOT_PASSWORD="$MONGO_INITDB_ROOT_PASSWORD" \
+  --set chat-service.secrets.OLLAMA_API_URL="$OLLAMA_API_URL" \
   --set kong.secrets.KONG_PG_PASSWORD="$KONG_PG_PASSWORD" \
   --set mongo.secrets.MONGO_INITDB_ROOT_PASSWORD="$MONGO_INITDB_ROOT_PASSWORD" \
   --set postgres.secrets.POSTGRES_PASSWORD="$POSTGRES_PASSWORD"

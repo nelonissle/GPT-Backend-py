@@ -1,14 +1,9 @@
 import os
-from dotenv import load_dotenv
 from sqlalchemy.ext.declarative import declarative_base
 from pymongo import MongoClient
 
 # ✅ Füge das hinzu
 Base = declarative_base()
-
-# .env laden
-# Load .env from project root
-load_dotenv(dotenv_path="../.env")
 
 # MongoDB-Setup
 MONGO_GPT_SERVICE_HOST = os.getenv("MONGO_GPT_SERVICE_HOST")

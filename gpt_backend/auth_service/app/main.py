@@ -1,9 +1,14 @@
+from dotenv import load_dotenv
+# Load .env from project root, regardless of working directory
+load_dotenv()
+
 from fastapi import FastAPI
 from app.routes import auth_routes
 from app.database import engine, Base, SessionLocal
 from app.models.user import User
 from passlib.context import CryptContext
 
+# Initialize FastAPI application
 app = FastAPI()
 app.include_router(auth_routes.router, prefix="/auth", tags=["Authentication"])
 

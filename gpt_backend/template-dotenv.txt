@@ -1,26 +1,38 @@
-# non secret environment variables
-
-# ollama 
-OLLAMA_MODEL=llama3
-OLLAMA_API_URL=http://ollama:11434
+# GPT Backend - environment variables
 
 # my microservice
+
+## admin microservice (dependency to jwt, mongo, kong)
+AUTH_SERVICE_URL=/auth
+
+## auth microservice
 DATABASE_URL=sqlite:///app/data/auth.db
-KONG_ADMIN_URL=http://kong-gateway:8001/consumers
+SECRET_KEY=your-256-bit-secret
+ALGORITHM=HS256
+KONG_ADMIN_URL=/consumers
+KONG_ADMIN_PORT=8001
+#KONG_ADMIN_URL=http://kong-gateway:8001/consumers
 
-# admin access
-AUTH_SERVICE_URL=http://kong-gateway:8000/auth
+## chat microservice (dependency to mongo)
+OLLAMA_API_URL=http://ollama:11434
+OLLAMA_MODEL=llama3
 
-# mongo db
+# 3rd party services
+
+## mongo db
 MONGO_INITDB_ROOT_USERNAME=mongoadmin
-MONGO_SERVICE_HOST=mongo_db
-MONGO_SERVICE_PORT=27017
+MONGO_GPT_SERVICE_HOST=localhost
+MONGO_GPT_SERVICE_PORT=27017
+### secrets
+MONGO_INITDB_ROOT_PASSWORD=secret
 
-# kong
+## kong (dependency to postgres)
 KONG_DATABASE=postgres
-KONG_PG_HOST=kong-database
-KONG_PG_PORT=5432
+KONG_PG_HOST = POSTGRES_GPT_SERVICE_HOST
+KONG_PG_PORT = POSTGRES_GPT_SERVICE_PORT
 KONG_PG_USER=kong
+### secret kong pg password
+KONG_PG_PASSWORD=kongpassword
 KONG_PG_DATABASE=kong
 KONG_PROXY_ACCESS_LOG=/var/log/kong/access.log
 KONG_PROXY_ERROR_LOG=/var/log/kong/error.log
@@ -28,7 +40,13 @@ KONG_ADMIN_ACCESS_LOG=/var/log/kong/admin_access.log
 KONG_ADMIN_ERROR_LOG=/var/log/kong/admin_error.log
 KONG_LOG_LEVEL=debug
 KONG_ADMIN_LISTEN="0.0.0.0:8001,0.0.0.0:8444 ssl"
+
+## postgres
 POSTGRES_USER=kong
 POSTGRES_DB=kong
+### secret postgres pwd
+POSTGRES_PASSWORD=kongpassword
 
-
+## grafana
+### secrets grafana pwd
+GF_SECURITY_ADMIN_PASSWORD=secret

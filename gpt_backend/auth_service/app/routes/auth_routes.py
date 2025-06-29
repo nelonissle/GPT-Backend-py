@@ -8,7 +8,10 @@ from app.models.user import User
 from app.utils.jwt_helper import create_access_token
 from app.utils.password_utils import hash_password, verify_password, is_valid_password
 from app.utils.kong_consumer import create_kong_consumer, create_kong_jwt_credentials
+from dotenv import load_dotenv
 import os
+
+load_dotenv(dotenv_path="../../.env")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
