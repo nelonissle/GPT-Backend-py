@@ -1,0 +1,124 @@
+@llmserver = http://192.168.9.181:8000
+@konggw = http://localhost:8000
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJyb2xlIjoiZGV2ZWxvcGVyIiwiaXNzIjoidGVzdHVzZXIyIiwiaWF0IjoxNzQ5NDAxMzEzLCJleHAiOjE3NDk2NjA1MTMsImp0aSI6ImE0YTVlOTkzLWNjZWQtNDAyZi04YmNhLWEyYjgwOTQ5OTM1NCJ9.qV3W1rR1xpCTBP7ESs63maayaaJV64eOy20Y7bPxKqk
+@dev_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJyb2xlIjoiZGV2ZWxvcGVyIiwiaXNzIjoidGVzdHVzZXIyIiwiaWF0IjoxNzQ5NDAxMzEzLCJleHAiOjE3NDk2NjA1MTMsImp0aSI6ImE0YTVlOTkzLWNjZWQtNDAyZi04YmNhLWEyYjgwOTQ5OTM1NCJ9.qV3W1rR1xpCTBP7ESs63maayaaJV64eOy20Y7bPxKqk
+@chatId = 682df0f5795c27ef0b57086c
+@username = testuser35
+
+### ─────────────────────────────────────────────────────────────
+
+### LLM Server Test
+GET {{llmserver}}/ HTTP/1.1
+
+
+### ─────────────────────────────────────────────────────────────
+
+### Test: Registrierung eines neuen Users über den Kong-Gateway
+POST {{konggw}}/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "testuser2",
+  "password": "VeryStrongPassword123!@",
+  "role": "developer"
+}
+
+### Test: Login mit dem neuen User (über den Kong-Gateway)
+POST {{konggw}}/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "testuser1",
+  "password": "VeryStrongPassword123!@"
+}
+
+### GET request to get all users
+GET {{konggw}}/auth/users HTTP/1.1
+Authorization: Bearer {{token}}
+
+### 1. Test: Neuen Chat erstellen
+POST {{konggw}}/chat/new HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "initial_query": "Hallo, dies ist mein erster Testchat"
+  
+}
+
+
+### "llm_response": "Dummy-Antwort des LLM."
+
+### → Antwort: {"message":"Neuer Chat erstellt","chat_id":"<SET THIS AS {{chatId}}>"}  
+
+### 2. Test: Nachricht ohne chat_id hinzufügen (schreibt in zuletzt aktive Konversation)
+POST {{konggw}}/chat/add HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "role": "user",
+  "text": "Das ist eine Nachricht im aktiven Chat."
+}
+
+### 3. Test: Nachricht mit expliziter chat_id hinzufügen
+POST {{konggw}}/chat/add HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "chat_id": "{{chatId}}",
+  "role": "user",
+  "text": "Das ist eine Nachricht in einem bestimmten Chat.TEST1"
+}
+
+### 4. Test: Liste aller Chats (nur Zusammenfassung, sortiert nach zuletzt benutzt)
+GET {{konggw}}/chat/history HTTP/1.1
+Authorization: Bearer {{token}}
+
+### 5. Test: Einen einzelnen Chat komplett abrufen
+GET {{konggw}}/chat/{{chatId}} HTTP/1.1
+Authorization: Bearer {{token}}
+
+
+### ─────────────────────────────────────────────────────────────
+### Admin‑Service Tests
+### ─────────────────────────────────────────────────────────────
+
+### A. Ohne Token: List all users → 401 Unauthorized
+GET {{konggw}}/admin/users HTTP/1.1
+
+### B. Mit normalem User‑Token: List all users → 403 Forbidden
+GET {{konggw}}/admin/users HTTP/1.1
+Authorization: Bearer {{token}}
+
+### C. Mit Developer‑Token: List all users → 200 OK
+GET {{konggw}}/admin/users HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### D. Developer‑Token: List chats of a specific user
+GET {{konggw}}/admin/users/{{username}}/chats HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### E. Developer‑Token: Get a specific chat
+GET {{konggw}}/admin/users/{{username}}/chats/{{chatId}} HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### F. Developer‑Token: Delete a specific chat
+DELETE {{konggw}}/admin/users/{{username}}/chats/{{chatId}} HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### G. Developer‑Token: Confirm deletion (should no longer find that chat)
+GET {{konggw}}/admin/users/{{username}}/chats HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### H. Developer‑Token: Delete the user entirely
+DELETE {{konggw}}/admin/users/{{username}} HTTP/1.1
+Authorization: Bearer {{dev_token}}
+
+### I. Developer‑Token: Confirm user deletion (should return 404)
+GET {{konggw}}/admin/users/{{username}}/chats HTTP/1.1
+Authorization: Bearer {{dev_token}}
+ 
+ 
