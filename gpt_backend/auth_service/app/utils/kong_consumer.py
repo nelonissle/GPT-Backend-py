@@ -6,7 +6,7 @@ admin_url = os.getenv("KONG_ADMIN_URL", "/consumers")
 auth_service = os.getenv("AUTH_SERVICE_URL", "/auth")
 kong_host = os.getenv("KONG_GATEWAY_SERVICE_SERVICE_HOST", "localhost")
 kong_port = os.getenv("KONG_ADMIN_PORT", "8001")
-#kong_admin_url = os.getenv("KONG_ADMIN_URL", "http://kong-gateway:8001/consumers")
+# kong_admin_url = os.getenv("KONG_ADMIN_URL", "http://kong-gateway:8001/consumers")
 kong_admin_url = f"http://{kong_host}:{kong_port}{auth_service}"
 
 def create_kong_consumer(username: str):
