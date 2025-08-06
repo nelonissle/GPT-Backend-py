@@ -65,7 +65,8 @@ services:
       - ./.env
     volumes:
       - authdb_data:/app/data
-      - logs_data:/app/logs
+      - ./logs:/app/logs                    # Individual service logs
+      - ./global_logs:/app/global_logs      # Global logs shared across all services
     networks:
       - gpt_backend_network
     depends_on:
@@ -138,6 +139,8 @@ services:
    volumes:
     - ./monitoring/promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
     - ./kong_logs:/var/log/kong:ro
+    - ./logs:/var/log/microservices:ro          # Add microservice logs
+    - ./global_logs:/var/log/global:ro          # Add global logs
     - /var/lib/docker/containers:/var/lib/docker/containers:ro
     - /var/run/docker.sock:/var/run/docker.sock:ro
    networks:

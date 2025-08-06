@@ -10,3 +10,5 @@ pyjwt
 pyyaml
 requests
 bcrypt==4.0.1
+structlog
+python-json-logger

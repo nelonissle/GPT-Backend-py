@@ -17,6 +17,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy the rest of the application code to the container
 COPY . .
 
+# Create logs directory inside container
+RUN mkdir -p /app/logs
+
 # Expose the port that FastAPI will run on (here, 8002)
 EXPOSE 8002
 
@@ -25,6 +28,7 @@ ENV PYTHONUNBUFFERED=1
 
 VOLUME ["/app/data"]
 VOLUME ["/app/logs"]
+VOLUME ["/app/global_logs"]
 
 # Command to run the application using uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8002"]
