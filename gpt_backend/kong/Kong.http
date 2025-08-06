@@ -1,8 +1,8 @@
 @Kong_GatewayAddress = http://localhost:8000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJyb2xlIjoiZGV2ZWxvcGVyIiwiaXNzIjoidGVzdHVzZXIyIiwiaWF0IjoxNzQ5NDAxMzEzLCJleHAiOjE3NDk2NjA1MTMsImp0aSI6ImE0YTVlOTkzLWNjZWQtNDAyZi04YmNhLWEyYjgwOTQ5OTM1NCJ9.qV3W1rR1xpCTBP7ESs63maayaaJV64eOy20Y7bPxKqk
-@dev_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJyb2xlIjoiZGV2ZWxvcGVyIiwiaXNzIjoidGVzdHVzZXIyIiwiaWF0IjoxNzQ5NDAxMzEzLCJleHAiOjE3NDk2NjA1MTMsImp0aSI6ImE0YTVlOTkzLWNjZWQtNDAyZi04YmNhLWEyYjgwOTQ5OTM1NCJ9.qV3W1rR1xpCTBP7ESs63maayaaJV64eOy20Y7bPxKqk
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXZlbG9wZXIiLCJyb2xlIjoiZGV2ZWxvcGVyIiwiaXNzIjoiZGV2ZWxvcGVyIiwiaWF0IjoxNzU0NDgyNjcxLCJleHAiOjE3NTQ3NDE4NzEsImp0aSI6ImQxYzE3ZDQ1LWU4NDktNDg5My05ZjI0LTgwYmJkMzUxN2E5NyJ9.BbJvbhCEpMsyVNHnYykpGKZ760hA90ZzASuzmY8_kOM
+@dev_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXZlbG9wZXIiLCJyb2xlIjoiZGV2ZWxvcGVyIiwiaXNzIjoiZGV2ZWxvcGVyIiwiaWF0IjoxNzU0NDgyNjcxLCJleHAiOjE3NTQ3NDE4NzEsImp0aSI6ImQxYzE3ZDQ1LWU4NDktNDg5My05ZjI0LTgwYmJkMzUxN2E5NyJ9.BbJvbhCEpMsyVNHnYykpGKZ760hA90ZzASuzmY8_kOM
 @chatId = 682df0f5795c27ef0b57086c
-@username = testuser35
+@username = testuser10
 
 
 ### Test: Registrierung eines neuen Users über den Kong-Gateway
@@ -10,7 +10,7 @@ POST {{Kong_GatewayAddress}}/auth/register HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "testuser2",
+  "username": "testuser10",
   "password": "VeryStrongPassword123!@",
   "role": "developer"
 }
@@ -20,8 +20,8 @@ POST {{Kong_GatewayAddress}}/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "testuser1",
-  "password": "VeryStrongPassword123!@"
+  "username": "developer",
+  "password": "DeveloperPassword123!"
 }
 
 ### GET request to get all users
