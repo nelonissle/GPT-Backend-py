@@ -65,8 +65,8 @@ services:
       - ./.env
     volumes:
       - authdb_data:/app/data
-      - ./logs:/app/logs                    # Individual service logs
-      - ./global_logs:/app/global_logs      # Global logs shared across all services
+      - ./logs:/app/logs                    
+      - ./global_logs:/app/global_logs      
     networks:
       - gpt_backend_network
     depends_on:
@@ -83,8 +83,8 @@ services:
       - ./.env
     volumes:
       - chatdb_data:/app/data
-      - ./logs:/app/logs                    # Individual service logs
-      - ./global_logs:/app/global_logs      # Global logs shared across all services
+      - ./logs:/app/logs                    
+      - ./global_logs:/app/global_logs      
     networks:
       - gpt_backend_network
     depends_on:
@@ -100,12 +100,15 @@ services:
     env_file:
       - ./.env
     volumes:
-      - logs_data:/app/logs
+       - admindb_data:/app/data               
+       - ./logs:/app/logs                     
+       - ./global_logs:/app/global_logs       
     networks:
       - gpt_backend_network
     depends_on:
       - auth_service
       - chat_service
+      - mongo_db
     restart: always
 
   # —————— Monitoring Stack ——————
@@ -141,8 +144,8 @@ services:
    volumes:
     - ./monitoring/promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
     - ./kong_logs:/var/log/kong:ro
-    - ./logs:/var/log/microservices:ro          # Add microservice logs
-    - ./global_logs:/var/log/global:ro          # Add global logs
+    - ./logs:/var/log/microservices:ro
+    - ./global_logs:/var/log/global:ro
     - /var/lib/docker/containers:/var/lib/docker/containers:ro
     - /var/run/docker.sock:/var/run/docker.sock:ro
    networks:
@@ -211,9 +214,8 @@ volumes:
   loki_compactor:
   ollama_data:
   authdb_data:
-  logs_data:
-  chatdb_data:          # Fixed: Added missing chatdb_data volume
-  admindb_data:         # Fixed: Added missing admindb_data volume
+  chatdb_data:          
+  admindb_data:         
 networks:
   gpt_backend_network:
     name: gpt_backend_network

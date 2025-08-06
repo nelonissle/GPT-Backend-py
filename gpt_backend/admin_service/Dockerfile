@@ -12,9 +12,14 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # 👇 Wichtig: Nur `app/`-Verzeichnis gezielt kopieren!
 COPY ./app ./app
 
+# Create logs directory inside container
+RUN mkdir -p /app/logs
+
 EXPOSE 8004
 ENV PYTHONUNBUFFERED=1
 
+VOLUME ["/app/data"]
 VOLUME ["/app/logs"]
+VOLUME ["/app/global_logs"]
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8004"]
