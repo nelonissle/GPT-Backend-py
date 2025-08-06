@@ -1,10 +1,12 @@
 fastapi
 uvicorn[standard]
 python-dotenv
-motor
+pydantic
 pytest
+httpx
+pyyaml
+requests
+structlog
+python-json-logger
 pymongo
 pyjwt
-requests
-pydantic
-httpx

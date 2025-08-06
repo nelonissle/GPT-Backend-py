@@ -82,7 +82,9 @@ services:
     env_file:
       - ./.env
     volumes:
-      - logs_data:/app/logs
+      - chatdb_data:/app/data
+      - ./logs:/app/logs                    # Individual service logs
+      - ./global_logs:/app/global_logs      # Global logs shared across all services
     networks:
       - gpt_backend_network
     depends_on:
@@ -210,7 +212,8 @@ volumes:
   ollama_data:
   authdb_data:
   logs_data:
-
+  chatdb_data:          # Fixed: Added missing chatdb_data volume
+  admindb_data:         # Fixed: Added missing admindb_data volume
 networks:
   gpt_backend_network:
     name: gpt_backend_network
