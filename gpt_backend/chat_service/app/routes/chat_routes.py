@@ -100,11 +100,11 @@ async def new_chat(request: NewChatRequest, credentials: HTTPAuthorizationCreden
         result = user_collection.insert_one(chat_doc)
         
         chat_id = str(result.inserted_id)
-        logger.info("new_chat_created_successfully", 
-                   username=username, 
-                   chat_id=chat_id, 
-                   chat_name=chat_name,
-                   message_count=len(chat_doc["messages"]))
+        logger.info("new_chat_created_successfully",
+                    username=username,
+                    chat_id=chat_id,
+                    chat_name=chat_name,
+                    message_count=len(chat_doc["messages"]))
         
         return {"message": "Neuer Chat erstellt", "chat_id": chat_id}
         
@@ -115,10 +115,10 @@ async def new_chat(request: NewChatRequest, credentials: HTTPAuthorizationCreden
 
 @router.post("/add")
 async def add_message(message: ChatMessageInput, credentials: HTTPAuthorizationCredentials = Depends(security)):
-    logger.info("add_message_request", 
-               chat_id=message.chat_id, 
-               role=message.role, 
-               message_length=len(message.text))
+    logger.info("add_message_request",
+                chat_id=message.chat_id,
+                role=message.role,
+                message_length=len(message.text))
     
     token = credentials.credentials
     payload = verify_token(token)
@@ -145,10 +145,10 @@ async def add_message(message: ChatMessageInput, credentials: HTTPAuthorizationC
             logger.info("using_specified_chat", username=username, chat_id=str(chat_id))
 
         now = datetime.utcnow()
-        logger.info("updating_chat_with_message", 
-                   username=username, 
-                   chat_id=str(chat_id), 
-                   role=message.role)
+        logger.info("updating_chat_with_message",
+                    username=username,
+                    chat_id=str(chat_id),
+                    role=message.role)
         
         update_result = user_collection.update_one(
             {"_id": chat_id},
@@ -167,17 +167,17 @@ async def add_message(message: ChatMessageInput, credentials: HTTPAuthorizationC
         )
         
         if update_result.modified_count == 0:
-            logger.warning("add_message_failed", 
-                          username=username, 
-                          chat_id=str(chat_id), 
-                          reason="chat_not_found")
+            logger.warning("add_message_failed",
+                           username=username,
+                           chat_id=str(chat_id),
+                           reason="chat_not_found")
             raise HTTPException(status_code=404, detail="Chat nicht gefunden")
         
-        logger.info("message_added_successfully", 
-                   username=username, 
-                   chat_id=str(chat_id), 
-                   role=message.role,
-                   message_length=len(message.text))
+        logger.info("message_added_successfully",
+                    username=username,
+                    chat_id=str(chat_id),
+                    role=message.role,
+                    message_length=len(message.text))
         
         return {"message": "Nachricht erfolgreich hinzugefügt", "chat_id": str(chat_id)}
         
@@ -247,11 +247,11 @@ async def get_chat(chat_id: str, credentials: HTTPAuthorizationCredentials = Dep
         chat["_id"] = str(chat["_id"])
         message_count = len(chat.get("messages", []))
         
-        logger.info("chat_retrieved_successfully", 
-                   username=username, 
-                   chat_id=chat_id, 
-                   chat_name=chat.get("chat_name"),
-                   message_count=message_count)
+        logger.info("chat_retrieved_successfully",
+                    username=username,
+                    chat_id=chat_id,
+                    chat_name=chat.get("chat_name"),
+                    message_count=message_count)
         
         return chat
         

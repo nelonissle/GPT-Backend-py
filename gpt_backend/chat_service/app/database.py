@@ -31,9 +31,9 @@ def get_db():
     ]
     
     if missing:
-        logger.error("mongodb_connection_failed", 
-                    reason="missing_environment_variables", 
-                    missing_vars=missing)
+        logger.error("mongodb_connection_failed",
+                     reason="missing_environment_variables",
+                     missing_vars=missing)
         raise ValueError(
             "Die Umgebungsvariable(n) " + ", ".join(missing) + " ist/sind nicht gesetzt."
         )
@@ -52,9 +52,9 @@ def get_db():
         return db
         
     except Exception as e:
-        logger.error("mongodb_connection_error", 
-                    host=host, 
-                    port=port, 
-                    database=db_name, 
-                    error=str(e))
+        logger.error("mongodb_connection_error",
+                     host=host,
+                     port=port,
+                     database=db_name,
+                     error=str(e))
         raise
