@@ -223,14 +223,16 @@ services:
 
   # cAdvisor for container metrics
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:v0.47.0  # Use specific version
     container_name: cadvisor
+    privileged: true  # Add this line
     restart: always
     volumes:
       - /:/rootfs:ro
-      - /var/run:/var/run:rw
+      - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
     ports:
       - "8080:8080"
     networks:
@@ -241,8 +243,9 @@ services:
     image: bitnami/mongodb-exporter:latest
     container_name: mongodb-exporter
     restart: always
-    environment:
-      - MONGODB_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo_db:27017/admin
+    command:
+      - '--mongodb.uri=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo_db:27017/admin'
+      - '--collect-all'
     ports:
       - "9216:9216"
     networks:

@@ -33,9 +33,24 @@ scrape_configs:
             level: level
             service: service
             event: event
+            # Extract more metadata for better filtering
+            username: username
+            method: method
+            path: path
+            status_code: status_code
+            error: error
+            process_time: process_time
       - labels:
           service:
           level:
+          event:  # Add event as label for better filtering
+          method: # HTTP method label
+      - labeldrop:
+          - filename  # Drop unnecessary labels
+      # Add multiline handling for stack traces
+      - multiline:
+          firstline: '^\s*\{\s*"timestamp"'
+          max_wait_time: 3s
       - timestamp:
           source: timestamp
           format: RFC3339Nano

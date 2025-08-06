@@ -2,13 +2,14 @@ import os
 import time
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
+from prometheus_fastapi_instrumentator import Instrumentator  # Add this import
+
 # Load .env from project root, regardless of working directory
 load_dotenv()
 
 from fastapi import FastAPI, Request
 from app.routes import admin_routes
 from app.utils.logger import setup_logging
-from prometheus_fastapi_instrumentator import Instrumentator
 
 # Setup logging
 logger = setup_logging("admin_service", os.getenv("LOG_LEVEL", "INFO"))
@@ -19,9 +20,6 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("admin_service_starting", port=8004)
     
-    # Any startup operations for admin service can go here
-    logger.info("admin_service_started", port=8004)
-    
     yield
     
     # Shutdown
@@ -31,11 +29,9 @@ async def lifespan(app: FastAPI):
 # Initialize FastAPI application with lifespan
 app = FastAPI(title="Admin Service", lifespan=lifespan)
 
-# Add metrics instrumentation
-@app.on_event("startup")
-async def startup():
-    Instrumentator().instrument(app).expose(app)
-    logger.info("prometheus_metrics_endpoint_initialized", endpoint="/metrics")
+# Add Prometheus metrics
+Instrumentator().instrument(app).expose(app)
+logger.info("prometheus_metrics_initialized", endpoint="/metrics")
 
 
 @app.middleware("http")
