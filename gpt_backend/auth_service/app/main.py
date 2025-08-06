@@ -11,6 +11,7 @@ from app.database import engine, Base, SessionLocal
 from app.models.user import User
 from app.utils.logger import setup_logging
 from passlib.context import CryptContext
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # Setup logging
 logger = setup_logging("auth_service", os.getenv("LOG_LEVEL", "INFO"))
@@ -59,6 +60,13 @@ async def lifespan(app: FastAPI):
 
 # Initialize FastAPI application with lifespan
 app = FastAPI(title="Auth Service", lifespan=lifespan)
+
+# Add metrics instrumentation
+@app.on_event("startup")
+async def startup():
+    Instrumentator().instrument(app).expose(app)
+    logger.info("prometheus_metrics_endpoint_initialized", endpoint="/metrics")
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):

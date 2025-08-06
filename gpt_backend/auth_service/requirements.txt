@@ -12,3 +12,4 @@ requests
 bcrypt==4.0.1
 structlog
 python-json-logger
+prometheus-fastapi-instrumentator

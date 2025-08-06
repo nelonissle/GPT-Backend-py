@@ -11,3 +11,4 @@ python-json-logger
 pyjwt
 sqlalchemy
 pymongo
+prometheus-fastapi-instrumentator

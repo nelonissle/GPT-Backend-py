@@ -10,3 +10,4 @@ structlog
 python-json-logger
 pymongo
 pyjwt
+prometheus-fastapi-instrumentator

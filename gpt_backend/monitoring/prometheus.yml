@@ -3,13 +3,13 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  # — Kong metrics
+  # — API Gateway metrics
   - job_name: kong
     metrics_path: /metrics
     static_configs:
       - targets: ['kong-gateway:8001']
 
-  # — Optionally scrape your services
+  # — Application services
   - job_name: auth_service
     metrics_path: /metrics
     static_configs:
@@ -24,3 +24,22 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets: ['admin_service:8004']
+
+  # — Host metrics
+  - job_name: node-exporter
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # — Container metrics
+  - job_name: cadvisor
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # — Database metrics
+  - job_name: mongodb-exporter
+    static_configs:
+      - targets: ['mongodb-exporter:9216']
+      
+  - job_name: postgres-exporter
+    static_configs:
+      - targets: ['postgres-exporter:9187']
