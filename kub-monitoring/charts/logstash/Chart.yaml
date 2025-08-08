@@ -1,4 +1,8 @@
 apiVersion: v2
 name: logstash
 version: 0.1.0
-description: Logstash microservice chart
+description: Logstash for GPT-Backend monitoring
+type: application
+appVersion: "8.6.0"
+maintainers:
+  - name: GPT-Backend Team

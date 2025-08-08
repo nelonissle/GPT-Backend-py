@@ -1,0 +1,65 @@
+# Default values for loki
+nameOverride: ""
+fullnameOverride: ""
+
+# Namespace to deploy resources
+namespace: gpt-monitoring
+
+# Replicas for loki deployment
+replicaCount: 1
+
+# Pod resources
+resources:
+  requests:
+    cpu: "200m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+# Image configuration
+image:
+  repository: grafana/loki
+  tag: "2.8.3"
+  pullPolicy: IfNotPresent
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 3100
+  targetPort: 3100
+  grpcPort: 9095
+
+# Persistence configuration
+persistence:
+  enabled: true
+  storageClass: "standard"
+  size: "10Gi"
+  accessMode: ReadWriteOnce
+
+# Loki configuration
+config:
+  auth:
+    enabled: false
+  server:
+    httpPort: 3100
+    grpcPort: 9095
+  ingester:
+    chunkIdlePeriod: "5m"
+    chunkRetainPeriod: "30s"
+  schema:
+    retentionPeriod: "168h"
+  storage:
+    type: "filesystem"  # Options: filesystem, s3, gcs, azure
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: loki.gpt-backend.local
+      paths:
+        - path: /
+          pathType: Prefix

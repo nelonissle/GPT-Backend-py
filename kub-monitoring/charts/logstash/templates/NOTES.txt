@@ -1,0 +1,14 @@
+Logstash has been deployed to your cluster!
+
+Logstash is configured with the following ports:
+{{- range .Values.service.ports }}
+- {{ .name }}: {{ .port }} ({{ .protocol }})
+{{- end }}
+
+Logstash is connected to Elasticsearch at: {{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}
+
+To check Logstash status, run:
+  kubectl port-forward --namespace {{ .Values.namespace }} svc/{{ include "logstash.fullname" . }} 9600:9600
+  curl http://localhost:9600/_node/stats
+
+For troubleshooting, check

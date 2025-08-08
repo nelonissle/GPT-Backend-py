@@ -1,8 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: logstash-config
-  namespace: skybooker
+  name: {{ include "logstash.fullname" . }}-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "logstash.labels" . | nindent 4 }}
 data:
   logstash.conf: |
     input {

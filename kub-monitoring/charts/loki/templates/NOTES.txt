@@ -1,0 +1,17 @@
+Loki has been deployed to your cluster!
+
+Loki HTTP URL: http://{{ include "loki.fullname" . }}.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.service.port }}
+Loki gRPC URL: {{ include "loki.fullname" . }}.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.service.grpcPort }}
+
+{{- if .Values.ingress.enabled }}
+Loki can be accessed via Ingress:
+{{- range .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}
+{{- end }}
+{{- else }}
+To access Loki from outside the cluster, run:
+  kubectl port-forward --namespace {{ .Values.namespace }} svc/{{ include "loki.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+{{- end }}
+
+For troubleshooting, check pod logs:
+  kubectl logs -f -n {{ .Values.namespace }} -l "app.kubernetes.io/name={{ include "loki.name" . }}"

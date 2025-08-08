@@ -1,28 +1,59 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: loki
-  namespace: skybooker
+  name: {{ include "loki.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "loki.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: loki
+      {{- include "loki.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: loki
+        {{- include "loki.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - name: loki
-          image: grafana/loki:latest
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - -config.file=/etc/loki/loki-config.yaml
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: {{ .Values.config.server.httpPort }}
+              protocol: TCP
+            - name: grpc
+              containerPort: {{ .Values.config.server.grpcPort }}
+              protocol: TCP
           volumeMounts:
-            - name: logs
-              mountPath: /app/logs
+            - name: config
+              mountPath: /etc/loki
+            - name: data
+              mountPath: /loki
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 60
       volumes:
-        - name: logs
-          hostPath:
-            path: /app/logs
-            type: DirectoryOrCreate
+        - name: config
+          configMap:
+            name: {{ include "loki.fullname" . }}-config
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "loki.fullname" . }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

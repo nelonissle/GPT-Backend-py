@@ -1,0 +1,16 @@
+Prometheus has been deployed to your cluster!
+
+Prometheus URL: http://{{ include "prometheus.fullname" . }}:{{ .Values.service.port }}
+
+{{- if .Values.ingress.enabled }}
+Prometheus can be accessed via Ingress:
+{{- range .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}
+{{- end }}
+{{- else }}
+To access Prometheus from outside the cluster, run:
+  kubectl port-forward --namespace {{ .Values.namespace }} svc/{{ include "prometheus.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+{{- end }}
+
+For troubleshooting, check pod logs:
+  kubectl logs -f -n {{ .Values.namespace }} -l "app.kubernetes.io/name={{ include "prometheus.name" . }}"

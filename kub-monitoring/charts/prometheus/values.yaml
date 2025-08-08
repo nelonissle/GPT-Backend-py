@@ -1,0 +1,126 @@
+# Default values for prometheus
+nameOverride: ""
+fullnameOverride: ""
+
+# Namespace to deploy resources
+namespace: gpt-monitoring
+
+# Replicas for prometheus deployment
+replicaCount: 1
+
+# Pod resources
+resources:
+  requests:
+    cpu: "300m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "2Gi"
+
+# Image configuration
+image:
+  repository: prom/prometheus
+  tag: "v2.46.0"
+  pullPolicy: IfNotPresent
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 9090
+  targetPort: 9090
+
+# Persistence configuration
+persistence:
+  enabled: true
+  storageClass: "standard"
+  size: "20Gi"
+  accessMode: ReadWriteOnce
+
+# Prometheus configuration
+config:
+  scrapeInterval: 15s
+  evaluationInterval: 15s
+  retention: "15d"
+  
+  # Scrape targets
+  scrapeConfigs:
+    # GPT-Backend services
+    - job_name: 'kong'
+      metrics_path: /metrics
+      static_configs:
+        - targets: ['kong-gateway.gpt-backend.svc.cluster.local:8100']
+    
+    - job_name: 'auth_service'
+      metrics_path: /metrics
+      static_configs:
+        - targets: ['auth-service.gpt-backend.svc.cluster.local:8080']
+    
+    - job_name: 'chat_service'
+      metrics_path: /metrics
+      static_configs:
+        - targets: ['chat-service.gpt-backend.svc.cluster.local:8080']
+    
+    - job_name: 'admin_service'
+      metrics_path: /metrics
+      static_configs:
+        - targets: ['admin-service.gpt-backend.svc.cluster.local:8080']
+    
+    - job_name: 'ollama'
+      metrics_path: /metrics
+      static_configs:
+        - targets: ['ollama-service.gpt-llm.svc.cluster.local:11434']
+    
+    # Node & Kubernetes monitoring
+    - job_name: 'node'
+      kubernetes_sd_configs:
+        - role: node
+      relabel_configs:
+        - source_labels: [__address__]
+          regex: (.+):(.+)
+          target_label: __address__
+          replacement: ${1}:9100
+        - source_labels: [__meta_kubernetes_node_name]
+          target_label: node
+
+    - job_name: 'kubernetes-apiservers'
+      kubernetes_sd_configs:
+        - role: endpoints
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: default;kubernetes;https
+
+# Alerting configuration
+alerting:
+  enabled: false
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Rules configuration
+rules:
+  - name: example
+    rules:
+      - alert: HighErrorRate
+        expr: job:request_latency_seconds:mean5m{job="chat_service"} > 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: High request latency on {{ $labels.instance }}
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: prometheus.gpt-backend.local
+      paths:
+        - path: /
+          pathType: Prefix

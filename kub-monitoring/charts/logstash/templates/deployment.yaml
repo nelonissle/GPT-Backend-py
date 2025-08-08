@@ -1,28 +1,90 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: logstash
-  namespace: skybooker
+  name: {{ include "logstash.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "logstash.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: logstash
+      {{- include "logstash.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: logstash
+        {{- include "logstash.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - name: logstash
-          image: docker.elastic.co/logstash/logstash:8.6.0
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 8080
+            {{- range .Values.service.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .targetPort }}
+              protocol: {{ .protocol }}
+            {{- end }}
+          env:
+            - name: LS_JAVA_OPTS
+              value: {{ .Values.config.logstashJavaOpts }}
+            - name: PIPELINE_WORKERS
+              value: {{ .Values.config.pipelineWorkers | quote }}
+            - name: PIPELINE_BATCH_SIZE
+              value: {{ .Values.config.pipelineBatchSize | quote }}
+            - name: PIPELINE_BATCH_DELAY
+              value: {{ .Values.config.pipelineBatchDelay | quote }}
+            - name: QUEUE_CHECKPOINT_WRITES
+              value: {{ .Values.config.queueCheckpointWrites | quote }}
+            - name: ELASTICSEARCH_HOST
+              value: {{ .Values.elasticsearch.host | quote }}
+            - name: ELASTICSEARCH_PORT
+              value: {{ .Values.elasticsearch.port | quote }}
+            {{- if .Values.elasticsearch.useExistingSecret }}
+            - name: ELASTICSEARCH_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.elasticsearch.existingSecret }}
+                  key: {{ .Values.elasticsearch.secretUserKey }}
+            - name: ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.elasticsearch.existingSecret }}
+                  key: {{ .Values.elasticsearch.secretPasswordKey }}
+            {{- else }}
+            - name: ELASTICSEARCH_USER
+              value: {{ .Values.elasticsearch.user | quote }}
+            - name: ELASTICSEARCH_PASSWORD
+              value: {{ .Values.elasticsearch.password | quote }}
+            {{- end }}
           volumeMounts:
-            - name: logs
-              mountPath: /app/logs
+            - name: config
+              mountPath: /usr/share/logstash/pipeline/logstash.conf
+              subPath: logstash.conf
+            - name: data
+              mountPath: /usr/share/logstash/data
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /_node/stats
+              port: 9600
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /_node/stats
+              port: 9600
+            initialDelaySeconds: 60
+            periodSeconds: 10
       volumes:
-        - name: logs
-          hostPath:
-            path: /app/logs
-            type: DirectoryOrCreate
+        - name: config
+          configMap:
+            name: {{ include "logstash.fullname" . }}-config
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "logstash.fullname" . }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
