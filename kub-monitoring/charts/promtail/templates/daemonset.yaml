@@ -1,13 +1,12 @@
-{{- if not .Values.useAsDaemonset }}
+{{- if .Values.useAsDaemonset }}
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: {{ include "promtail.fullname" . }}
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "promtail.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "promtail.selectorLabels" . | nindent 6 }}
@@ -16,12 +15,19 @@ spec:
       labels:
         {{- include "promtail.selectorLabels" . | nindent 8 }}
     spec:
+      serviceAccountName: {{ include "promtail.fullname" . }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - "-config.file=/etc/promtail/promtail-config.yaml"
+            - "-config.expand-env=true"
+          env:
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           ports:
             - name: http
               containerPort: {{ .Values.config.serverPort }}
@@ -38,6 +44,19 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsUser: 0
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 10
       volumes:
         - name: config
           configMap:
@@ -48,4 +67,7 @@ spec:
             path: {{ $value.hostPath }}
             type: DirectoryOrCreate
         {{- end }}
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
 {{- end }}

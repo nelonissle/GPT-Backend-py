@@ -1,0 +1,106 @@
+# Default values for promtail
+nameOverride: ""
+fullnameOverride: ""
+
+# Namespace to deploy resources
+namespace: gpt-monitoring
+
+# Replicas for promtail daemonset/deployment
+replicaCount: 1
+
+# Pod resources
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "200m"
+    memory: "256Mi"
+
+# Image configuration
+image:
+  repository: grafana/promtail
+  tag: "2.8.3"
+  pullPolicy: IfNotPresent
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 9080
+  targetPort: 9080
+
+# Use DaemonSet instead of Deployment
+useAsDaemonset: true
+
+# Volume configuration
+volumes:
+  logs:
+    hostPath: /var/log
+    mountPath: /var/log
+  docker:
+    hostPath: /var/lib/docker/containers
+    mountPath: /var/lib/docker/containers
+    readOnly: true
+  positions:
+    hostPath: /tmp/promtail-positions
+    mountPath: /tmp/positions
+
+# Loki configuration
+loki:
+  url: "http://loki:3100/loki/api/v1/push"
+
+# Promtail configuration
+config:
+  serverPort: 9080
+  positions:
+    filename: /tmp/positions/positions.yaml
+  
+  # Scrape configs
+  scrapeConfigs:
+    - job_name: kubernetes-pods-name
+      pipeline_stages:
+        - docker: {}
+      kubernetes_sd_configs:
+        - role: pod
+      relabel_configs:
+        - source_labels:
+            - __meta_kubernetes_pod_label_app_kubernetes_io_name
+          target_label: __service__
+        - source_labels:
+            - __meta_kubernetes_pod_node_name
+          target_label: __host__
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - action: replace
+          replacement: $1
+          separator: /
+          source_labels:
+            - __meta_kubernetes_namespace
+            - __service__
+          target_label: job
+        - action: replace
+          source_labels:
+            - __meta_kubernetes_namespace
+          target_label: namespace
+        - action: replace
+          source_labels:
+            - __meta_kubernetes_pod_name
+          target_label: pod
+        - action: replace
+          source_labels:
+            - __meta_kubernetes_pod_container_name
+          target_label: container
+        - replacement: /var/log/pods/*$1/*.log
+          separator: /
+          source_labels:
+            - __meta_kubernetes_pod_uid
+            - __meta_kubernetes_pod_container_name
+          target_label: __path__
+    
+    - job_name: gpt-backend-logs
+      static_configs:
+        - targets:
+            - localhost
+          labels:
+            job: gpt-backend
+            __path__: /var/log/gpt-backend/*.log

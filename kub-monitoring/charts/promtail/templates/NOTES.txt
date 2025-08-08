@@ -1,0 +1,13 @@
+Promtail has been deployed to your cluster!
+
+It will collect logs from your pods and send them to Loki at:
+{{ .Values.loki.url }}
+
+{{- if .Values.useAsDaemonset }}
+Promtail is deployed as a DaemonSet and will run on every node in your cluster.
+{{- else }}
+Promtail is deployed as a Deployment with {{ .Values.replicaCount }} replicas.
+{{- end }}
+
+For troubleshooting, check pod logs:
+  kubectl logs -f -n {{ .Values.namespace }} -l "app.kubernetes.io/name={{ include "promtail.name" . }}"
