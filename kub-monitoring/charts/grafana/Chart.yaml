@@ -1,4 +1,8 @@
 apiVersion: v2
 name: grafana
 version: 0.1.0
-description: Grafana microservice chart
+description: Grafana for GPT-Backend monitoring
+type: application
+appVersion: "9.5.1"
+maintainers:
+  - name: GPT-Backend Team

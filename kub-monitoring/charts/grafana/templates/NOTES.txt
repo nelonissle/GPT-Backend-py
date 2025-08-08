@@ -1,0 +1,20 @@
+Grafana has been deployed to your cluster!
+
+Grafana URL: http://{{ include "grafana.fullname" . }}:{{ .Values.service.port }}
+
+Default credentials:
+- Username: {{ .Values.admin.user }}
+- Password: {{ .Values.admin.password }}
+
+{{- if .Values.ingress.enabled }}
+Grafana can be accessed via Ingress:
+{{- range .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}
+{{- end }}
+{{- else }}
+To access Grafana from outside the cluster, run:
+  kubectl port-forward --namespace {{ .Values.namespace }} svc/{{ include "grafana.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+{{- end }}
+
+For troubleshooting, check pod logs:
+  kubectl logs -f -n {{ .Values.namespace }} -l "app.kubernetes.io/name={{ include "grafana.name" . }}"

@@ -1,4 +1,20 @@
 apiVersion: v2
-name: monitoring
-description: Umbrella Chart for Monitoring
+name: gpt-monitoring
+description: Umbrella Chart for GPT-Backend Monitoring
 version: 0.1.0
+dependencies:
+  - name: prometheus
+    version: ^15.0.0
+    repository: https://prometheus-community.github.io/helm-charts
+  - name: grafana
+    version: ^6.0.0
+    repository: https://grafana.github.io/helm-charts
+  - name: elasticsearch
+    version: ^19.5.0
+    repository: https://helm.elastic.co
+  - name: kibana
+    version: ^10.2.0
+    repository: https://helm.elastic.co
+  - name: logstash
+    version: ^10.2.0
+    repository: https://helm.elastic.co

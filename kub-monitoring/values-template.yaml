@@ -1,28 +1,149 @@
 secrets:
-  JWTROOTTOKEN: "$JWTROOTTOKEN"
-  AUTH_ADMIN_PWD: "$AUTH_ADMIN_PWD"
-
-  MARIADB_PASSWORD: "$MARIADB_PASSWORD"
-  MARIADB_ROOT_PASSWORD: "$MARIADB_ROOT_PASSWORD"
-
-  MONGO_PASSWORD: "$MONGO_PASSWORD"
-  MONGO_INITDB_ROOT_PASSWORD: "$MONGO_INITDB_ROOT_PASSWORD"
-  MONGO_INITDB_ROOT_USERNAME: "$MONGO_INITDB_ROOT_USERNAME"
-  MONGO_DATABASE_NAME: "$MONGO_DATABASE_NAME"
-
-  TWILIO_ACCOUNTSID: "$TWILIO_ACCOUNTSID"
-  TWILIO_AUTHTOKEN: "$TWILIO_AUTHTOKEN"
-  TWILIO_PHONE_NUMBER: "$TWILIO_PHONE_NUMBER"
-  MESSAGING_DESTINATIONPHONE: "$MESSAGING_DESTINATIONPHONE"
-
-  RABBITMQ_DEFAULT_PASS: "$RABBITMQ_DEFAULT_PASS"
-
+  # Prometheus & Grafana secrets
+  GRAFANA_ADMIN_USER: "$GRAFANA_ADMIN_USER"
   GRAFANA_ADMIN_PASSWORD: "$GRAFANA_ADMIN_PASSWORD"
-  GF_SECURITY_ADMIN_PASSWORD: "$GF_SECURITY_ADMIN_PASSWORD"
-
-
-
-
-
   
+  # ELK Stack secrets
+  ELASTIC_PASSWORD: "$ELASTIC_PASSWORD"
+  ELASTIC_USERNAME: "$ELASTIC_USERNAME"
+  KIBANA_ENCRYPTION_KEY: "$KIBANA_ENCRYPTION_KEY"
+  LOGSTASH_INTERNAL_PASSWORD: "$LOGSTASH_INTERNAL_PASSWORD"
+
+# Prometheus configuration
+prometheus:
+  enabled: true
+  server:
+    persistentVolume:
+      enabled: true
+      size: 50Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+  alertmanager:
+    enabled: true
+    persistentVolume:
+      enabled: true
+      size: 10Gi
+
+# Grafana configuration
+grafana:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 10Gi
+  adminUser: "admin"
+  adminPassword: "${GRAFANA_ADMIN_PASSWORD}"
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://{{ .Release.Name }}-prometheus-server
+        access: proxy
+        isDefault: true
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        options:
+          path: /var/lib/grafana/dashboards/default
+  dashboards:
+    default:
+      kong-dashboard:
+        gnetId: 7424
+        revision: 1
+        datasource: Prometheus
+      node-exporter:
+        gnetId: 1860
+        revision: 21
+        datasource: Prometheus
+      mongodb-dashboard:
+        gnetId: 2583
+        revision: 1
+        datasource: Prometheus
+      fastapi-dashboard:
+        gnetId: 14282
+        revision: 1
+        datasource: Prometheus
+
+# Elasticsearch configuration
+elasticsearch:
+  enabled: true
+  replicas: 3
+  minimumMasterNodes: 2
+  clusterName: "gpt-elasticsearch"
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  volumeClaimTemplate:
+    accessModes: ["ReadWriteOnce"]
+    resources:
+      requests:
+        storage: 30Gi
+
+# Kibana configuration
+kibana:
+  enabled: true
+  elasticsearchHosts: "http://{{ .Release.Name }}-elasticsearch-master:9200"
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+# Logstash configuration
+logstash:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 20Gi
+  resources:
+    requests:
+      cpu: 300m
+      memory: 512Mi
+    limits:
+      cpu: 800m
+      memory: 1Gi
+  logstashPipeline:
+    logstash.conf: |
+      input {
+        beats {
+          port => 5044
+        }
+      }
+      filter {
+        json {
+          source => "message"
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["${ELASTICSEARCH_HOST:elasticsearch-master:9200}"]
+          user => "${ELASTIC_USERNAME}"
+          password => "${ELASTIC_PASSWORD}"
+          index => "gpt-backend-logs-%{+YYYY.MM.dd}"
+        }
+      }
+
+
+
+
+
+
 

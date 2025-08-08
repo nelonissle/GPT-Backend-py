@@ -1,9 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: elastic-config
-  namespace: skybooker
+  name: {{ include "elasticsearch.fullname" . }}-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "elasticsearch.labels" . | nindent 4 }}
 data:
-  discovery.type: "single-node"
-  ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-  xpack.security.enabled: "false"
+  discovery.type: {{ .Values.config.discoveryType | quote }}
+  ES_JAVA_OPTS: {{ .Values.config.javaOpts | quote }}
+  xpack.security.enabled: {{ .Values.config.xpackSecurityEnabled | quote }}
+  cluster.name: {{ .Values.config.clusterName | quote }}

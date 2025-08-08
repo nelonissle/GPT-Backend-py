@@ -1,4 +1,8 @@
 apiVersion: v2
 name: elasticsearch
 version: 0.1.0
-description: Elasticsearch microservice chart
+description: Elasticsearch for GPT-Backend monitoring
+type: application
+appVersion: "8.6.0"
+maintainers:
+  - name: GPT-Backend Team

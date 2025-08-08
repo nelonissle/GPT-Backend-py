@@ -1,0 +1,95 @@
+# Default values for grafana
+nameOverride: ""
+fullnameOverride: ""
+
+# Namespace to deploy resources
+namespace: gpt-monitoring
+
+# Replicas for grafana deployment
+replicaCount: 1
+
+# Pod resources
+resources:
+  requests:
+    cpu: "200m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+# Image configuration
+image:
+  repository: grafana/grafana
+  tag: "9.5.1"
+  pullPolicy: IfNotPresent
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+# Persistence configuration
+persistence:
+  enabled: true
+  storageClass: "standard"
+  size: "10Gi"
+  accessMode: ReadWriteOnce
+
+# Admin user configuration
+admin:
+  user: admin
+  password: admin
+  existingSecret: ""
+
+# Grafana configuration
+config:
+  plugins: "grafana-piechart-panel,grafana-worldmap-panel"
+  allowEmbedding: true
+  autoAssignOrg: true
+  dashboardProvider:
+    enabled: true
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: grafana.gpt-backend.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: grafana-tls
+      hosts:
+        - grafana.gpt-backend.local
+
+# Datasources configuration
+datasources:
+  - name: Prometheus
+    type: prometheus
+    url: http://prometheus-server.gpt-monitoring.svc.cluster.local
+    access: proxy
+    isDefault: true
+
+# Dashboards to import
+dashboards:
+  default:
+    kong-dashboard:
+      gnetId: 7424
+      revision: 1
+      datasource: Prometheus
+    node-exporter:
+      gnetId: 1860
+      revision: 21
+      datasource: Prometheus
+    mongodb-dashboard:
+      gnetId: 2583
+      revision: 1
+      datasource: Prometheus
+    fastapi-dashboard:
+      gnetId: 14282
+      revision: 1
+      datasource: Prometheus
