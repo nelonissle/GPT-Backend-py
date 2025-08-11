@@ -1,22 +1,22 @@
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from app.main import app
-from app.database import Base, get_db
+def test_register_empty_credentials(client):
+    # Test registration with empty username
+    response = client.post("/auth/register", json={
+        "username": "",
+        "password": "VeryStrongPassword!1",
+        "role": "Kunde"
+    })
+    assert response.status_code == 400
+    assert "required" in response.json()["detail"].lower()
+    
+    # Test registration with empty password
+    response = client.post("/auth/register", json={
+        "username": "emptypassuser",
+        "password": "",
+        "role": "Kunde"
+    })
+    assert response.status_code == 400
+    assert "required" in response.json()["detail"].lower()
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
-
-# Create a single connection and bind the session to it
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-connection = engine.connect()
-Base.metadata.create_all(bind=connection)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=connection)
-
-@pytest.fixture(autouse=True)
-def set_env(monkeypatch):
-    monkeypatch.setenv("SECRET_KEY", "testsecret")
-    monkeypatch.setenv("ALGORITHM", "HS256")
 
 @pytest.fixture
 def client():
